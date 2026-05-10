@@ -31,7 +31,7 @@ public class UserWebAuthController {
         return "redirect:/auth/login";
     }
 
-    @GetMapping("login")
+    @GetMapping("/login")
     public String loginPage(){
         return "login";
     }

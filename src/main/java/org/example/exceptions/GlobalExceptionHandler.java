@@ -17,7 +17,7 @@ public class GlobalExceptionHandler {
 
     @ExceptionHandler(ResourceNotFoundException.class)
     public Object handleNotFound(ResourceNotFoundException ex, HttpServletRequest request){
-        if (request.getRequestURI().equals("/api/")) {
+        if (request.getRequestURI().startsWith("/api/")) {
             return ResponseEntity.status(HttpStatus.NOT_FOUND)
                     .body(AppErrorDto.builder()
                             .message(ex.getMessage())

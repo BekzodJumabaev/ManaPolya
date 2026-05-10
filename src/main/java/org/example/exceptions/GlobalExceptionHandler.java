@@ -33,7 +33,7 @@ public class GlobalExceptionHandler {
 
     @ExceptionHandler(BadRequestException.class)
     public Object handleBadRequest(BadRequestException ex, HttpServletRequest request){
-        if (request.getRequestURI().equals("/api/")) {
+        if (request.getRequestURI().startsWith("/api/")) {
             return ResponseEntity.status(HttpStatus.BAD_REQUEST)
                     .body(AppErrorDto.builder()
                             .message(ex.getMessage())

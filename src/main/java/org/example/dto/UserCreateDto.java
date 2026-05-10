@@ -4,6 +4,7 @@ import jakarta.persistence.Column;
 import jakarta.persistence.EnumType;
 import jakarta.persistence.Enumerated;
 import jakarta.validation.constraints.NotBlank;
+import jakarta.validation.constraints.NotNull;
 import jakarta.validation.constraints.Pattern;
 import jakarta.validation.constraints.Size;
 import lombok.*;
@@ -29,11 +30,11 @@ public class UserCreateDto {
 
 
     @NotBlank(message = "FIO bo'sh bo'lmasligi kerak")
-    private String fullName;
+    private String fullname;
 
     @Pattern(regexp = "^\\+998\\d{9}$", message = "Telofon raqam +998******** formada bo'lishi kerak")
     private String phoneNumber;
 
-    @NonNull
+    @NotNull(message = "Rol tanlanishi kerak")
     private UserRole role;
 }

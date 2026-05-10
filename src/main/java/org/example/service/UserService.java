@@ -19,8 +19,8 @@ import java.util.Optional;
 public class UserService {
 
     private final UserRepository userRepository;
-    private PasswordEncoder passwordEncoder;
-    private ModelMapper modelMapper;
+    private final PasswordEncoder passwordEncoder;
+    private final ModelMapper modelMapper;
 
 
     public UserResponceDto register(UserCreateDto dto) {

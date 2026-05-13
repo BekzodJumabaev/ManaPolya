@@ -69,4 +69,12 @@ public class SportFieldService {
         return new DataList<>(dtoList, fieldPage.getTotalElements(), fieldPage.getTotalPages());
     }
 
+    public SportFieldResponceDto getById(long id) {
+        SportField sportField = sportFieldRepository.findById(id).orElseThrow(() ->
+                new ResourceNotFoundException("Maydon topilmadi: " + id));
+        SportFieldResponceDto responceDto = modelMapper.map(sportField, SportFieldResponceDto.class);
+        responceDto.setDistrictName(sportField.getDistrict().getDistrictName());
+        responceDto.setRegionName(sportField.getDistrict().getRegion().getRegionName());
+        return responceDto;
+    }
 }

@@ -17,7 +17,7 @@ public interface SportFieldRepository extends JpaRepository<SportField, Long> {
 
     @Query("""
      select s from SportField s 
-     where (: search is null or s.name ilike concat('%', :search, '%')
+     where (cast(:search as string) is null or s.name ilike concat('%', cast(:search as string), '%')
      and s.deleted=false)
           """)
     Page<SportField> findByCriteria(@Param("search") String search, Pageable pageable);

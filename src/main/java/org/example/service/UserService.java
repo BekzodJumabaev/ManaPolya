@@ -4,7 +4,6 @@ import lombok.RequiredArgsConstructor;
 import org.example.dto.UserCreateDto;
 import org.example.dto.UserResponceDto;
 import org.example.entity.User;
-import org.example.enums.UserRole;
 import org.example.exceptions.BadRequestException;
 import org.example.exceptions.ResourceNotFoundException;
 import org.example.repository.UserRepository;
@@ -12,7 +11,6 @@ import org.modelmapper.ModelMapper;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
-import java.util.Optional;
 
 @Service
 @RequiredArgsConstructor
@@ -31,7 +29,9 @@ public class UserService {
             throw new BadRequestException("Bu username mavjud");
         }
         User user = modelMapper.map(dto, User.class);
+/*
         user.setRole(UserRole.USER);
+*/
         user.setPassword(passwordEncoder.encode(dto.getPassword()));
         User save = userRepository.save(user);
         return modelMapper.map(save, UserResponceDto.class);

@@ -6,6 +6,7 @@ import org.example.dto.LoginDto;
 import org.example.dto.UserCreateDto;
 import org.example.dto.UserResponceDto;
 import org.example.service.UserService;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
@@ -18,7 +19,8 @@ public class UserRestAuthController {
 
     @PostMapping("/signup")
     public ResponseEntity<UserResponceDto> signUp(@Valid @RequestBody UserCreateDto dto){
-        return ResponseEntity.ok(userService.register(dto));
+        UserResponceDto responceDto = userService.register(dto);
+        return new ResponseEntity<>(responceDto, HttpStatus.CREATED);
     }
 
     @PostMapping("/login")

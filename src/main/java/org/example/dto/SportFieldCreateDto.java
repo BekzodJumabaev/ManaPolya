@@ -1,38 +1,41 @@
-package org.example.entity;
+package org.example.dto;
 
 import jakarta.persistence.*;
+import jakarta.validation.constraints.NotBlank;
+import jakarta.validation.constraints.NotNull;
 import lombok.*;
+import org.example.entity.District;
+import org.example.entity.ImageField;
+import org.example.entity.User;
 import org.example.enums.FieldType;
 
 import java.math.BigDecimal;
 import java.time.LocalTime;
 import java.util.List;
 
-@Entity
 @Getter
 @Setter
 @AllArgsConstructor
 @NoArgsConstructor
 @Builder
-public class SportField extends BaseEntity {
+public class SportFieldCreateDto {
 
+    @NotBlank(message = "Nomi bosh bo'lmasligi kerak:")
     private String name;
+
+    @NotBlank(message = "Manzil kiritish shart:")
     private String address;
 
-    @Column(columnDefinition = "TEXT")
     private String description;
 
+    @NotNull(message = "Soatbay narxi kiritilishi shart:")
     private BigDecimal priceHour;
 
-    @Enumerated(EnumType.STRING)
+    @NotNull(message = "Maydon turini kiriting:")
     private FieldType fieldType;
 
-    @ManyToOne(fetch = FetchType.LAZY)
-    private District district;
-
-    @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "owner_id")
-    private User owner;
+    @NotNull(message = "Tuman tanlanishi kerak:")
+    private Long districtId;
 
     private LocalTime openTime;
     private LocalTime closeTime;
@@ -42,11 +45,4 @@ public class SportField extends BaseEntity {
 
     private Double latitude;
     private Double longitude;
-
-    private Double avarageRating = 0.0;
-    private Integer RatingCount = 0;
-
-    @OneToMany(cascade = CascadeType.ALL, mappedBy = "field")
-    private List<ImageField> images;
-
 }

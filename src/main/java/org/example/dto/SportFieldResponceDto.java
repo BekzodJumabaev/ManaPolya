@@ -33,5 +33,6 @@ public class SportFieldResponceDto {
     private Double latitude;
     private Double longitude;
     private Double avarageRating;
+    List<ImageResponceDto> images;
 
 }

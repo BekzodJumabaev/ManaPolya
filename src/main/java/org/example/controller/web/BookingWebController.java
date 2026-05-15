@@ -13,14 +13,13 @@ import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 import java.security.Principal;
 
 @Controller
-@RequestMapping
+@RequestMapping("/fields")
 @RequiredArgsConstructor
 public class BookingWebController {
 
     private final BookingService bookingService;
 
-    @PostMapping("/fields/{id}/book")
-
+    @PostMapping("/{id}/book")
     public String bookField(
             @PathVariable("id") Long id,
             @ModelAttribute BookingCreateDto dto,

@@ -1,15 +1,11 @@
 package org.example.dto;
 
-import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
-import org.example.entity.SportField;
-import org.example.entity.User;
-import org.example.enums.BookingStatus;
+import org.springframework.format.annotation.DateTimeFormat;
 
-import java.math.BigDecimal;
 import java.time.LocalDateTime;
 
 @Getter
@@ -18,6 +14,7 @@ import java.time.LocalDateTime;
 @NoArgsConstructor
 public class BookingCreateDto {
     private Long fieldId;
+    @DateTimeFormat(iso = DateTimeFormat.ISO.DATE_TIME)
     private LocalDateTime startTime;
     private LocalDateTime endTime;
 }

@@ -8,6 +8,7 @@ import jakarta.validation.constraints.NotNull;
 import jakarta.validation.constraints.Pattern;
 import jakarta.validation.constraints.Size;
 import lombok.*;
+import lombok.experimental.SuperBuilder;
 import org.example.enums.UserRole;
 import org.springframework.stereotype.Component;
 
@@ -15,7 +16,7 @@ import org.springframework.stereotype.Component;
 @Setter
 @AllArgsConstructor
 @NoArgsConstructor
-@Builder
+@SuperBuilder
 public class UserCreateDto {
 
     @NotBlank(message = "Username bo'sh bo'lmasligi kerak")

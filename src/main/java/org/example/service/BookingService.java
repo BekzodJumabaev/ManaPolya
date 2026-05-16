@@ -9,11 +9,10 @@ import org.example.entity.User;
 import org.example.enums.BookingStatus;
 import org.example.exceptions.BadRequestException;
 import org.example.exceptions.ResourceNotFoundException;
+import org.example.mapper.BookingMapper;
 import org.example.repository.BookingRepository;
 import org.example.repository.SportFieldRepository;
 import org.example.repository.UserRepository;
-import org.modelmapper.ModelMapper;
-import org.springframework.stereotype.Repository;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -27,7 +26,7 @@ public class BookingService {
     private final SportFieldRepository sportFieldRepository;
     private final UserRepository userRepository;
     private final BookingRepository bookingRepository;
-    private final ModelMapper modelMapper;
+    private final BookingMapper mapper;
 
     @Transactional
     public BookingResponceDto createBooking(BookingCreateDto dto, String username){
@@ -55,7 +54,7 @@ public class BookingService {
                 .status(BookingStatus.CONFIRMED)
                 .build();
         Booking save = bookingRepository.save(booking);
-        BookingResponceDto responceDto = modelMapper.map(save, BookingResponceDto.class);
+        BookingResponceDto responceDto = mapper.toDto(save);
         responceDto.setFieldName(sportField.getName());
         responceDto.setCustomerFullName(user.getFullname());
         return responceDto;

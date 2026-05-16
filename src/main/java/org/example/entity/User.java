@@ -2,14 +2,17 @@ package org.example.entity;
 
 import jakarta.persistence.*;
 import lombok.*;
+import lombok.experimental.SuperBuilder;
 import org.example.enums.UserRole;
+import org.hibernate.annotations.Where;
 
 @Entity
 @Getter
 @Setter
 @NoArgsConstructor
 @AllArgsConstructor
-@Builder
+@SuperBuilder
+@Where(clause = "deleted = false")
 @Table(name = "users")
 public class User extends BaseEntity {
 

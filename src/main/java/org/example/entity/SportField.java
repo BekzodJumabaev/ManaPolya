@@ -2,7 +2,9 @@ package org.example.entity;
 
 import jakarta.persistence.*;
 import lombok.*;
+import lombok.experimental.SuperBuilder;
 import org.example.enums.FieldType;
+import org.hibernate.annotations.Where;
 
 import java.math.BigDecimal;
 import java.time.LocalTime;
@@ -13,7 +15,8 @@ import java.util.List;
 @Setter
 @AllArgsConstructor
 @NoArgsConstructor
-@Builder
+@SuperBuilder
+@Where(clause = "deleted = false")
 public class SportField extends BaseEntity {
 
     private String name;
@@ -44,7 +47,7 @@ public class SportField extends BaseEntity {
     private Double longitude;
 
     private Double avarageRating = 0.0;
-    private Integer RatingCount = 0;
+    private Integer ratingCount = 0;
 
     @OneToMany(cascade = CascadeType.ALL, mappedBy = "field")
     private List<ImageField> images;

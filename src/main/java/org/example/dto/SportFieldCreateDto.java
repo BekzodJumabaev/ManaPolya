@@ -4,6 +4,7 @@ import jakarta.persistence.*;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
 import lombok.*;
+import lombok.experimental.SuperBuilder;
 import org.example.entity.District;
 import org.example.entity.ImageField;
 import org.example.entity.User;
@@ -17,7 +18,7 @@ import java.util.List;
 @Setter
 @AllArgsConstructor
 @NoArgsConstructor
-@Builder
+@SuperBuilder
 public class SportFieldCreateDto {
 
     @NotBlank(message = "Nomi bosh bo'lmasligi kerak:")

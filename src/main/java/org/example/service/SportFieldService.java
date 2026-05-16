@@ -7,11 +7,11 @@ import org.example.entity.District;
 import org.example.entity.SportField;
 import org.example.entity.User;
 import org.example.exceptions.ResourceNotFoundException;
+import org.example.mapper.SportFieldMapper;
 import org.example.repository.DistrictRepository;
 import org.example.repository.SportFieldRepository;
 import org.example.repository.UserRepository;
 import org.example.utils.DataList;
-import org.modelmapper.ModelMapper;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
@@ -27,7 +27,7 @@ public class SportFieldService {
     private final UserRepository userRepository;
     private final SportFieldRepository sportFieldRepository;
     private final DistrictRepository districtRepository;
-    private final ModelMapper modelMapper;
+    private final SportFieldMapper mapper;
 
     public SportFieldResponceDto create(String currentUsername, SportFieldCreateDto dto){
 
@@ -37,7 +37,7 @@ public class SportFieldService {
         User owner = userRepository.findByUsername(currentUsername).orElseThrow(() ->
                 new ResourceNotFoundException("Foydalanuvchi topilmadi: " + currentUsername));
 
-        SportField sportField = modelMapper.map(dto, SportField.class);
+        SportField sportField = mapper.toEntity(dto);
         sportField.setDistrict(district);
         sportField.setOwner(owner);
         sportField.setAvarageRating(0.0);
@@ -45,7 +45,7 @@ public class SportFieldService {
 
         SportField save = sportFieldRepository.save(sportField);
 
-        SportFieldResponceDto responceDto = modelMapper.map(save, SportFieldResponceDto.class);
+        SportFieldResponceDto responceDto = mapper.toDto(save);
         responceDto.setDistrictName(district.getDistrictName());
         responceDto.setRegionName(district.getRegion().getRegionName());
 
@@ -57,14 +57,7 @@ public class SportFieldService {
         Pageable pageable = PageRequest.of(page, size);
         Page<SportField> fieldPage = sportFieldRepository.findByCriteria(search, pageable);
 
-        List<SportFieldResponceDto> dtoList = fieldPage.getContent().stream()
-                .map(field -> {
-                    SportFieldResponceDto dto = modelMapper.map(field, SportFieldResponceDto.class);
-                    dto.setDistrictName(field.getDistrict().getDistrictName());
-                    dto.setRegionName(field.getDistrict().getRegion().getRegionName());
-                    return dto;
-                })
-                .collect(Collectors.toList());
+        List<SportFieldResponceDto> dtoList = mapper.toDtoList(fieldPage.getContent());
 
         return new DataList<>(dtoList, fieldPage.getTotalElements(), fieldPage.getTotalPages());
     }
@@ -72,7 +65,8 @@ public class SportFieldService {
     public SportFieldResponceDto getById(long id) {
         SportField sportField = sportFieldRepository.findById(id).orElseThrow(() ->
                 new ResourceNotFoundException("Maydon topilmadi: " + id));
-        SportFieldResponceDto responceDto = modelMapper.map(sportField, SportFieldResponceDto.class);
+
+        SportFieldResponceDto responceDto = mapper.toDto(sportField);
         responceDto.setDistrictName(sportField.getDistrict().getDistrictName());
         responceDto.setRegionName(sportField.getDistrict().getRegion().getRegionName());
         return responceDto;

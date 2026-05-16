@@ -1,11 +1,12 @@
 package org.example.dto;
 
 import lombok.*;
+import lombok.experimental.SuperBuilder;
 import org.example.enums.UserRole;
 
 @Getter
 @Setter
-@Builder
+@SuperBuilder
 @AllArgsConstructor
 @NoArgsConstructor
 public class UserResponceDto {

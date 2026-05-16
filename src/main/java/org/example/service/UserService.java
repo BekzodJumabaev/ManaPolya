@@ -6,8 +6,8 @@ import org.example.dto.UserResponceDto;
 import org.example.entity.User;
 import org.example.exceptions.BadRequestException;
 import org.example.exceptions.ResourceNotFoundException;
+import org.example.mapper.UserMapper;
 import org.example.repository.UserRepository;
-import org.modelmapper.ModelMapper;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
@@ -18,7 +18,7 @@ public class UserService {
 
     private final UserRepository userRepository;
     private final PasswordEncoder passwordEncoder;
-    private final ModelMapper modelMapper;
+    private final UserMapper mapper;
 
 
     public UserResponceDto register(UserCreateDto dto) {
@@ -28,19 +28,19 @@ public class UserService {
         if (userRepository.findByUsername(dto.getUsername()).isPresent()) {
             throw new BadRequestException("Bu username mavjud");
         }
-        User user = modelMapper.map(dto, User.class);
+        User user = mapper.toEntity(dto);
 /*
         user.setRole(UserRole.USER);
 */
         user.setPassword(passwordEncoder.encode(dto.getPassword()));
         User save = userRepository.save(user);
-        return modelMapper.map(save, UserResponceDto.class);
+        return mapper.toDto(save);
     }
 
     public UserResponceDto findById(Long id) {
         User user = userRepository.findById(id).orElseThrow(() ->
                 new ResourceNotFoundException("Foydalanuvchi topilmadi: " + id));
-        return modelMapper.map(user, UserResponceDto.class);
+        return mapper.toDto(user);
     }
 
 }

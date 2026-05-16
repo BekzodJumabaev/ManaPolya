@@ -1,12 +1,18 @@
 package org.example.entity;
 
 import jakarta.persistence.*;
-import lombok.Getter;
-import lombok.Setter;
+import lombok.*;
+import lombok.experimental.SuperBuilder;
+import org.hibernate.annotations.Where;
 
 @Entity
 @Getter
 @Setter
+@SuperBuilder
+@NoArgsConstructor
+@AllArgsConstructor
+@Where(clause = "deleted = false")
+
 public class District extends BaseEntity {
 
     private String districtName;

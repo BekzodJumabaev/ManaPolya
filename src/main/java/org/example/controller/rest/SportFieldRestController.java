@@ -18,7 +18,7 @@ import java.security.Principal;
 import java.util.List;
 
 @RestController
-@RequestMapping("api/fields")
+@RequestMapping("/api/fields")
 @RequiredArgsConstructor
 public class SportFieldRestController {
 

@@ -13,7 +13,7 @@ import java.util.Date;
 @Component
 public class JwtUtil {
 
-    private final String secreKey = "bu_maxviy_parol";
+    private final String secreKey = "YmF6aXlhdHNodW5hcWFqdWRhbWF4Zml5dmF1enVua2FsaXRzb3pidXllcmRhYm9saXNoaXNoYXJ0MjAyNg==";
     private final long expirationTime = 86400000;
 
     public String generateToken(String username) {

@@ -17,7 +17,9 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.math.BigDecimal;
+import java.math.RoundingMode;
 import java.time.Duration;
+import java.time.LocalTime;
 
 @Service
 @RequiredArgsConstructor
@@ -36,13 +38,28 @@ public class BookingService {
         User user = userRepository.findByUsername(username).orElseThrow(() ->
                 new ResourceNotFoundException("Foydalanuvchi " + username + " topilmadi"));
 
+
+        if (dto.getStartTime().isAfter(dto.getEndTime()) || dto.getStartTime().equals(dto.getEndTime())) {
+            throw new BadRequestException("Boshlanish vaqt tugash vaqtda oldin bo'lishi kerak");
+        }
+
+        LocalTime bookingStart = dto.getStartTime().toLocalTime();
+        LocalTime bookingEnd = dto.getEndTime().toLocalTime();
+
+        if (bookingStart.isBefore(sportField.getOpenTime()) || bookingEnd.isAfter(sportField.getCloseTime())) {
+            throw new BadRequestException("Tanlangan vaqt maydonning ish vaqtiga to'g'ri kelmaydi! " +
+                    "Ish vaqti: " +sportField.getOpenTime() + " - " + sportField.getCloseTime());
+        }
+
         if (bookingRepository.existsOverLappingBooking(dto.getFieldId(), dto.getStartTime(), dto.getEndTime())) {
             throw new BadRequestException("Bu vaqt oralig'i band: ");
         }
-        long hours = Duration.between(dto.getStartTime(), dto.getEndTime()).toHours();
-        if (hours < 1) throw new BadRequestException("Bron kamida 1 soat bo'lishi kerak: ");
+        long minutes = Duration.between(dto.getStartTime(), dto.getEndTime()).toMinutes();
+        if (minutes < 60) throw new BadRequestException("Bron kamida 1 soat bo'lishi kerak: ");
 
-        BigDecimal totalPrice = sportField.getPriceHour().multiply(new java.math.BigDecimal(hours));
+        BigDecimal hours = BigDecimal.valueOf(minutes).divide(BigDecimal.valueOf(60), 2, RoundingMode.HALF_UP);
+        BigDecimal totalPrice = sportField.getPriceHour().multiply(hours);
+
 
         Booking booking = Booking
                 .builder()
@@ -54,6 +71,7 @@ public class BookingService {
                 .status(BookingStatus.CONFIRMED)
                 .build();
         Booking save = bookingRepository.save(booking);
+
         BookingResponceDto responceDto = mapper.toDto(save);
         responceDto.setFieldName(sportField.getName());
         responceDto.setCustomerFullName(user.getFullname());

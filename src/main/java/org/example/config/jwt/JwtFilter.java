@@ -42,10 +42,10 @@ public class JwtFilter extends OncePerRequestFilter {
         try {
             username = jwtUtil.getUsernameFromToken(token);
         }catch (Exception e) {
-            filterChain.doFilter(request, response);
+            sendUnauthorizedResponse(response, "Token xato yoki muddati o'tgan:");
             return;
         }
-        if (username == null && SecurityContextHolder.getContext().getAuthentication() == null) {
+        if (username != null && SecurityContextHolder.getContext().getAuthentication() == null) {
             UserDetails userDetails = userDetailsService.loadUserByUsername(username);
 
             if (jwtUtil.validateToken(token)){
@@ -53,9 +53,16 @@ public class JwtFilter extends OncePerRequestFilter {
                         userDetails, null, userDetails.getAuthorities());
                 authToken.setDetails(new WebAuthenticationDetailsSource().buildDetails(request));
                 SecurityContextHolder.getContext().setAuthentication(authToken);
-
+            }else {
+                sendUnauthorizedResponse(response, "Token yaroqsiz: ");
             }
         }
         filterChain.doFilter(request, response);
+    }
+
+    private void sendUnauthorizedResponse(HttpServletResponse response, String s) throws IOException {
+        response.setContentType("application/json");
+        response.setStatus(HttpServletResponse.SC_UNAUTHORIZED);
+        response.getWriter().write("{\"error\": \"Unauthorized\", \"message\": \"" + s + "\"}");
     }
 }

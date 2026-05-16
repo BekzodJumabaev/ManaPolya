@@ -4,6 +4,7 @@ import jakarta.persistence.*;
 import lombok.*;
 import lombok.experimental.SuperBuilder;
 import org.example.enums.BookingStatus;
+import org.hibernate.annotations.SQLRestriction;
 import org.hibernate.annotations.Where;
 
 import java.math.BigDecimal;
@@ -15,8 +16,7 @@ import java.time.LocalDateTime;
 @AllArgsConstructor
 @NoArgsConstructor
 @SuperBuilder
-@Where(clause = "deleted = false")
-
+@SQLRestriction("deleted = false")
 public class Booking extends BaseEntity {
 
     @ManyToOne(fetch = FetchType.LAZY)

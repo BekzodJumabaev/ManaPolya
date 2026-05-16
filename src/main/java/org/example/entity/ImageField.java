@@ -6,6 +6,7 @@ import jakarta.persistence.JoinColumn;
 import jakarta.persistence.ManyToOne;
 import lombok.*;
 import lombok.experimental.SuperBuilder;
+import org.hibernate.annotations.SQLRestriction;
 import org.hibernate.annotations.Where;
 
 @Entity
@@ -14,7 +15,7 @@ import org.hibernate.annotations.Where;
 @SuperBuilder
 @NoArgsConstructor
 @AllArgsConstructor
-@Where(clause = "deleted = false")
+@SQLRestriction("deleted = false")
 public class ImageField extends BaseEntity {
 
     private String url;

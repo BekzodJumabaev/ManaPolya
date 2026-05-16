@@ -4,6 +4,7 @@ import jakarta.persistence.*;
 import lombok.*;
 import lombok.experimental.SuperBuilder;
 import org.example.enums.UserRole;
+import org.hibernate.annotations.SQLRestriction;
 import org.hibernate.annotations.Where;
 
 @Entity
@@ -12,7 +13,7 @@ import org.hibernate.annotations.Where;
 @NoArgsConstructor
 @AllArgsConstructor
 @SuperBuilder
-@Where(clause = "deleted = false")
+@SQLRestriction("deleted = false")
 @Table(name = "users")
 public class User extends BaseEntity {
 

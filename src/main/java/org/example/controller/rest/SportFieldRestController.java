@@ -5,6 +5,7 @@ import lombok.RequiredArgsConstructor;
 import org.example.dto.ImageResponceDto;
 import org.example.dto.SportFieldCreateDto;
 import org.example.dto.SportFieldResponceDto;
+import org.example.dto.SportFileldSearchDto;
 import org.example.service.ImageService;
 import org.example.service.SportFieldService;
 import org.example.utils.DataList;
@@ -36,11 +37,11 @@ public class SportFieldRestController {
 
     @GetMapping
     public  ResponseEntity<DataList<List<SportFieldResponceDto>>> getAll(
-            @RequestParam(required = false) String search,
+            @RequestParam(required = false) SportFileldSearchDto searchDto,
             @RequestParam(defaultValue = "0") int page,
             @RequestParam(defaultValue = "10") int size
     ){
-        DataList<List<SportFieldResponceDto>> all = sportFieldService.getAll(search, page, size);
+        DataList<List<SportFieldResponceDto>> all = sportFieldService.getAll(searchDto, page, size);
         return ResponseEntity.ok(all);
     }
 

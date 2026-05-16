@@ -3,6 +3,7 @@ package org.example.service;
 import lombok.RequiredArgsConstructor;
 import org.example.dto.SportFieldCreateDto;
 import org.example.dto.SportFieldResponceDto;
+import org.example.dto.SportFileldSearchDto;
 import org.example.entity.District;
 import org.example.entity.SportField;
 import org.example.entity.User;
@@ -11,10 +12,12 @@ import org.example.mapper.SportFieldMapper;
 import org.example.repository.DistrictRepository;
 import org.example.repository.SportFieldRepository;
 import org.example.repository.UserRepository;
+import org.example.repository.specification.SportFieldSpecification;
 import org.example.utils.DataList;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
+import org.springframework.data.jpa.domain.Specification;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
@@ -51,10 +54,16 @@ public class SportFieldService {
         return responceDto;
     }
 
-    public DataList<List<SportFieldResponceDto>> getAll(String search, int page, int size) {
+    public DataList<List<SportFieldResponceDto>> getAll(SportFileldSearchDto searchDto, int page, int size) {
 
         Pageable pageable = PageRequest.of(page, size);
-        Page<SportField> fieldPage = sportFieldRepository.findByCriteria(search, pageable);
+
+        if (searchDto == null) {
+            searchDto = new SportFileldSearchDto();
+        }
+
+        Specification<SportField> search = SportFieldSpecification.buildSpecification(searchDto);
+        Page<SportField> fieldPage = sportFieldRepository.findAll(search, pageable);
 
         List<SportFieldResponceDto> dtoList = mapper.toDtoList(fieldPage.getContent());
 

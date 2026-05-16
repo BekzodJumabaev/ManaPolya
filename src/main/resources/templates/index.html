@@ -5,17 +5,96 @@
     <title>ManaPolya - Asosiy</title>
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.1/font/bootstrap-icons.css">
+
+    <style>
+        .hudud-btn {
+            background-color: #198754 !important;
+            color: white !important;
+            border-radius: 8px;
+            font-weight: 600;
+            padding: 6px 16px;
+            border: none;
+            transition: all 0.2s;
+        }
+        .hudud-btn:hover {
+            background-color: #146c43 !important;
+        }
+        .hudud-dropdown-menu {
+            width: 280px;
+            max-height: 380px;
+            overflow-y: auto;
+            border-radius: 12px;
+            box-shadow: 0 8px 24px rgba(0,0,0,0.15);
+            border: 1px solid #e9ecef;
+            padding: 8px;
+        }
+        .hudud-item {
+            padding: 10px 12px;
+            font-size: 0.95rem;
+            color: #212529;
+            cursor: pointer;
+            border-radius: 6px;
+            transition: all 0.15s;
+            display: flex;
+            align-items: center;
+        }
+        .hudud-item:hover {
+            background-color: #f8f9fa;
+            color: #198754;
+        }
+        .hudud-header-btn {
+            color: #198754;
+            font-weight: bold;
+            cursor: pointer;
+            padding: 8px;
+            display: flex;
+            align-items: center;
+            gap: 6px;
+            font-size: 0.9rem;
+        }
+        .card-custom {
+            border-radius: 12px;
+            border: none;
+            transition: all 0.3s;
+        }
+        .card-custom:hover {
+            transform: translateY(-4px);
+            box-shadow: 0 12px 20px rgba(0,0,0,0.08) !important;
+        }
+    </style>
 </head>
 <body class="bg-light">
+
 <nav class="navbar navbar-expand-lg navbar-dark bg-success shadow-sm mb-4">
     <div class="container">
         <a class="navbar-brand fw-bold" href="/"><i class="bi bi-trophy-fill me-2"></i>ManaPolya</a>
-        <div class="d-flex align-items-center">
-            <span sec:authorize="isAuthenticated()" class="text-white me-3">
+
+        <div class="d-flex align-items-center gap-3">
+            <div class="dropdown">
+                <button class="btn hudud-btn dropdown-toggle shadow-sm" type="button" id="hududDropdownBtn" data-bs-toggle="dropdown" data-bs-auto-close="outside" aria-expanded="false">
+                    <i class="bi bi-geo-alt-fill me-1"></i> <span th:text="${currentRegionName}">Butun O'zbekiston</span>
+                </button>
+                <div class="dropdown-menu hudud-dropdown-menu" aria-labelledby="hududDropdownBtn" id="hududContainer">
+                    <div class="hudud-item fw-bold text-success" onclick="selectLocation(null, null)">
+                        <i class="bi bi-globe me-2"></i> Butun O'zbekiston
+                    </div>
+                    <hr class="my-1">
+
+                    <div th:each="region : ${regions}"
+                         class="hudud-item region-selector-item d-flex justify-content-between align-items-center"
+                         th:data-id="${region.id}"
+                         th:data-name="${region.regionName}">
+                        <span th:text="${region.regionName}">Viloyat</span>
+                        <i class="bi bi-chevron-right text-muted" style="font-size: 0.8rem;"></i>
+                    </div>
+                </div>
+            </div>
+
+            <span sec:authorize="isAuthenticated()" class="text-white small">
                 Salom, <span sec:authentication="name">User</span>!
             </span>
             <a sec:authorize="!isAuthenticated()" href="/auth/login" class="btn btn-outline-light btn-sm">Kirish</a>
-            <form sec:authorize="isAuthenticated()" th:action="@{/logout}" method="post">
+            <form sec:authorize="isAuthenticated()" th:action="@{/logout}" method="post" class="m-0">
                 <button type="submit" class="btn btn-danger btn-sm">Chiqish</button>
             </form>
         </div>
@@ -25,27 +104,123 @@
 <div class="container">
     <div class="row mb-4 justify-content-center">
         <div class="col-md-8">
-            <form th:action="@{/}" method="get" class="input-group shadow-sm">
-                <input type="text" name="search" th:value="${search}" class="form-control" placeholder="Maydon qidirish...">
-                <button type="submit" class="btn btn-success">Qidirish</button>
+            <form th:action="@{/}" method="get" class="input-group shadow-sm rounded-3 overflow-hidden">
+                <input type="hidden" name="regionId" th:value="${selectedRegionId}">
+                <input type="hidden" name="districtId" th:value="${selectedDistrictId}">
+                <input type="text" name="search" th:value="${search}" class="form-control border-0 px-3" placeholder="Maydon qidirish...">
+                <button type="submit" class="btn btn-success fw-bold px-4">Qidirish</button>
             </form>
         </div>
     </div>
 
-    <div class="row row-cols-1 row-cols-md-3 g-4">
+    <div class="row row-cols-1 row-cols-md-3 g-4 mb-5">
         <div th:each="field : ${fields}" th:if="${field != null}" class="col">
-            <div class="card h-100 shadow-sm border-0">
+            <div class="card h-100 card-custom shadow-sm">
                 <img th:if="${not #lists.isEmpty(field.images)}" th:src="${field.images[0].url}" class="card-img-top" style="height: 200px; object-fit: cover;">
                 <img th:if="${#lists.isEmpty(field.images)}" src="https://via.placeholder.com/400x250?text=No+Image" class="card-img-top" style="height: 200px; object-fit: cover;">
-                <div class="card-body">
-                    <h5 class="card-title fw-bold" th:text="${field.name}">Nomi</h5>
-                    <p class="text-muted small"><i class="bi bi-geo-alt-fill text-danger"></i> <span th:text="|${field.regionName}, ${field.districtName}|">Manzil</span></p>
-                    <p class="h5 text-success fw-bold" th:text="|${field.priceHour} so'm/soat|">Narx</p>
-                    <a th:href="@{|/fields/${field.id}|}" class="btn btn-outline-success w-100 mt-2">Batafsil ko'rish</a>
+                <div class="card-body d-flex flex-column">
+                    <h5 class="card-title fw-bold text-dark mb-1" th:text="${field.name}">Nomi</h5>
+                    <p class="text-muted small mb-3"><i class="bi bi-geo-alt text-danger me-1"></i> <span th:text="|${field.regionName}, ${field.districtName}|">Manzil</span></p>
+                    <div class="mt-auto">
+                        <p class="h5 text-success fw-bold mb-2" th:text="|${field.priceHour} so'm/soat|">Narx</p>
+                        <a th:href="@{|/fields/${field.id}|}" class="btn btn-outline-success w-100 fw-bold rounded-2 btn-sm">Batafsil ko'rish</a>
+                    </div>
                 </div>
             </div>
         </div>
     </div>
+
+    <div class="row mt-4" th:if="${totalPages > 1}">
+        <div class="col-12 d-flex justify-content-center">
+            <nav aria-label="Page navigation">
+                <ul class="pagination pagination-sm">
+                    <li class="page-item" th:classappend="${currentPage == 0} ? 'disabled'">
+                        <a class="page-link text-success" th:href="@{/(page=${currentPage - 1}, search=${search}, regionId=${selectedRegionId}, districtId=${selectedDistrictId})}"><i class="bi bi-chevron-left"></i></a>
+                    </li>
+
+                    <li class="page-item" th:each="i : ${#numbers.sequence(0, totalPages - 1)}" th:classappend="${currentPage == i} ? 'active'">
+                        <a class="page-link" th:classappend="${currentPage == i} ? 'bg-success border-success text-white' : 'text-success'"
+                           th:href="@{/(page=${i}, search=${search}, regionId=${selectedRegionId}, districtId=${selectedDistrictId})}" th:text="${i + 1}">1</a>
+                    </li>
+
+                    <li class="page-item" th:classappend="${currentPage == totalPages - 1} ? 'disabled'">
+                        <a class="page-link text-success" th:href="@{/(page=${currentPage + 1}, search=${search}, regionId=${selectedRegionId}, districtId=${selectedDistrictId})}"><i class="bi bi-chevron-right"></i></a>
+                    </li>
+                </ul>
+            </nav>
+        </div>
+    </div>
 </div>
+
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+
+<script th:inline="javascript">
+    const currentSearch = /*[[${search}]]*/ '';
+    const hududContainer = document.getElementById('hududContainer');
+
+    // Yangi yondashuv: Viloyat bosilganda data-atributlardan qiymatlarni o'qib olish
+    document.addEventListener('click', function(e) {
+        // Agar bosilgan element yoki uning otasi 'region-selector-item' klasiga ega bo'lsa
+        const item = e.target.closest('.region-selector-item');
+        if (item) {
+            const regionId = item.getAttribute('data-id');
+            const regionName = item.getAttribute('data-name');
+            loadDistrictsMenu(regionId, regionName);
+        }
+    });
+
+    // Tumanlar menyusini dinamik yuklash (O'zgarishsiz qoladi, faqat chaqiruv xavfsiz bo'ldi)
+    function loadDistrictsMenu(regionId, regionName) {
+        hududContainer.innerHTML = '<div class="text-center p-3"><div class="spinner-border spinner-border-sm text-success"></div></div>';
+
+        fetch('/auth/districts?regionId=' + regionId)
+            .then(res => res.json())
+            .then(districts => {
+                let html = `
+                    <div class="hudud-header-btn mb-1" onclick="resetToRegions()">
+                        <i class="bi bi-arrow-left-short fs-5"></i> Orqaga
+                    </div>
+                    <div class="hudud-item fw-bold text-success" onclick="selectLocation(${regionId}, null)">
+                        <i class="bi bi-geo-alt me-2"></i> Butun ${regionName}
+                    </div>
+                    <hr class="my-1">
+                `;
+
+                districts.forEach(dist => {
+                    html += `
+                        <div class="hudud-item" onclick="selectLocation(${regionId}, ${dist.id})">
+                            ${dist.districtName}
+                        </div>
+                    `;
+                });
+                hududContainer.innerHTML = html;
+            })
+            .catch(err => {
+                console.error(err);
+                resetToRegions();
+            });
+    }
+
+    function resetToRegions() {
+        window.location.reload();
+    }
+
+    function selectLocation(regionId, districtId) {
+        let url = '/?';
+        if (currentSearch) {
+            url += 'search=' + encodeURIComponent(currentSearch) + '&';
+        }
+        if (regionId) {
+            url += 'regionId=' + regionId + '&';
+        }
+        if (districtId) {
+            url += 'districtId=' + districtId + '&';
+        }
+        if (url.endsWith('&') || url.endsWith('?')) {
+            url = url.slice(0, -1);
+        }
+        window.location.href = url;
+    }
+</script>
 </body>
 </html>

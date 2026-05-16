@@ -2,6 +2,9 @@ package org.example.controller.web;
 
 import lombok.RequiredArgsConstructor;
 import org.example.dto.SportFieldResponceDto;
+import org.example.dto.SportFileldSearchDto;
+import org.example.repository.RegionRepository;
+import org.example.service.DistrictService;
 import org.example.service.SportFieldService;
 import org.example.utils.DataList;
 import org.springframework.stereotype.Controller;
@@ -17,19 +20,39 @@ import java.util.List;
 public class HomeController {
 
     private final SportFieldService sportFieldService;
+    private final RegionRepository regionRepository;
+    private final DistrictService districtService;
 
     @GetMapping("/")
     public String homePage(
-            @RequestParam(required = false) String search,
+            @RequestParam(required = false)String search,
+            @RequestParam(required = false)Long regionId,
+            @RequestParam(required = false)Long districtId,
             @RequestParam(defaultValue = "0") int page,
             @RequestParam(defaultValue = "10") int size,
             Model model){
 
-        DataList<List<SportFieldResponceDto>> all = sportFieldService.getAll(search, page, size);
+        SportFileldSearchDto searchDto = SportFileldSearchDto
+                .builder()
+                .search(search)
+                .districtId(districtId)
+                .regionId(regionId)
+                .build();
+
+        DataList<List<SportFieldResponceDto>> all = sportFieldService.getAll(searchDto, page, size);
+
         model.addAttribute("fields", all.getData());
         model.addAttribute("currentPage", page);
         model.addAttribute("totalPages",  all.getTotalPages());
         model.addAttribute("search", search);
+
+        String currentRegionName = districtService.getCurrentRegionName(regionId, districtId);
+
+        model.addAttribute("currentRegionName", currentRegionName);
+        model.addAttribute("selectedRegionId", regionId);
+        model.addAttribute("selectedDistrictId", districtId);
+        model.addAttribute("regions", regionRepository.findAll());
+
         return "index";
     }
 

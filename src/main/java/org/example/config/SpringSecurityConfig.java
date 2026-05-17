@@ -64,15 +64,21 @@ public class SpringSecurityConfig {
         http
                 .csrf(AbstractHttpConfigurer::disable)
                 .authorizeHttpRequests(auth -> auth
-                        .requestMatchers("/auth/**", "/").permitAll()
+                        .requestMatchers("/auth/login", "/auth/signup", "/auth/districts", "/").permitAll()
                         .requestMatchers("/css/**", "/js/**", "/images/**", "/uploads/**").permitAll()
+                        .requestMatchers(HttpMethod.GET, "/fields/{id}").permitAll()
+
+                        .requestMatchers("/fields/create").authenticated()
+                        .requestMatchers("/fields/*/book").authenticated()
+                        .requestMatchers("/profile/**").authenticated()
                         .anyRequest().authenticated()
                 )
                 .sessionManagement(session -> session
                         .sessionCreationPolicy(SessionCreationPolicy.IF_REQUIRED))
+
                 .formLogin(form -> form
                         .loginPage("/auth/login")
-                        .defaultSuccessUrl("/",  true)
+                        .defaultSuccessUrl("/",  false)
                         .permitAll()
                 )
                 .logout(logout -> logout

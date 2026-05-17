@@ -26,12 +26,15 @@ public class SportFieldRestController {
     private final SportFieldService sportFieldService;
     private final ImageService imageService;
 
-    @PostMapping
-    public ResponseEntity<SportFieldResponceDto> save(@Valid @RequestBody SportFieldCreateDto dto, Principal principal){
+    @PostMapping("/create")
+    public ResponseEntity<SportFieldResponceDto> createField(@Valid @RequestBody SportFieldCreateDto dto, Principal principal){
         if (principal==null){
             throw new ResponseStatusException(HttpStatus.UNAUTHORIZED);
         }
-        SportFieldResponceDto responceDto = sportFieldService.create(principal.getName(), dto);
+
+        String currentUsername = principal.getName();
+
+        SportFieldResponceDto responceDto = sportFieldService.create(currentUsername, dto);
         return new ResponseEntity<>(responceDto,HttpStatus.CREATED);
     }
 

@@ -8,6 +8,7 @@ import org.example.repository.RegionRepository;
 import org.example.service.BookingService;
 import org.example.service.DistrictService;
 import org.example.service.SportFieldService;
+import org.example.service.UserService;
 import org.example.utils.DataList;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
@@ -15,6 +16,7 @@ import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestParam;
 
+import java.security.Principal;
 import java.util.List;
 
 @Controller
@@ -25,6 +27,7 @@ public class HomeController {
     private final RegionRepository regionRepository;
     private final DistrictService districtService;
     private final BookingService bookingService;
+    private final UserService userService;
 
     @GetMapping("/")
     public String homePage(
@@ -33,15 +36,19 @@ public class HomeController {
             @RequestParam(required = false)Long districtId,
             @RequestParam(defaultValue = "0") int page,
             @RequestParam(defaultValue = "10") int size,
-            Model model){
+            Model model,
+            Principal principal){
 
+        if (principal != null){
+            String fullname = userService.findByUsername(principal.getName());
+            model.addAttribute("currentFullUsername", fullname);
+        }
         SportFileldSearchDto searchDto = SportFileldSearchDto
                 .builder()
                 .search(search)
                 .districtId(districtId)
                 .regionId(regionId)
                 .build();
-
         DataList<List<SportFieldResponceDto>> all = sportFieldService.getAll(searchDto, page, size);
 
         model.addAttribute("fields", all.getData());

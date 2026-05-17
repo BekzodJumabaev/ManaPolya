@@ -90,9 +90,16 @@
                 </div>
             </div>
 
-            <span sec:authorize="isAuthenticated()" class="text-white small">
-                Salom, <span sec:authentication="name">User</span>!
+            <span sec:authorize="isAuthenticated()" class="text-white small fw-bold">
+    Salom, <span th:text="${currentFullUsername} ?: 'Foydalanuvchi'"></span>!
             </span>
+
+            <span class="text-white small fw-bold">
+    Salom, <span th:text="${currentFullUserName}"></span>!
+            </span>
+            <a sec:authorize="isAuthenticated()" href="/owner/dashboard" class="btn btn-sm btn-light text-dark fw-bold ms-2">
+                <i class="bi bi-person-workspace"></i> Kabinetim
+            </a>
 
             <div sec:authorize="isAuthenticated()" class="me-3">
                 <a href="/fields/create" class="btn btn-light text-success fw-bold">

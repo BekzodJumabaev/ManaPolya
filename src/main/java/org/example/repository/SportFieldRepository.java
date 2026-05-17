@@ -22,4 +22,6 @@ public interface SportFieldRepository extends JpaRepository<SportField, Long>, J
      and s.deleted=false)
           """)
     Page<SportField> findByCriteria(@Param("search") String search, Pageable pageable);
+
+    List<SportField> findByOwnerUsername(String username);
 }

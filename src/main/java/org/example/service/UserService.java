@@ -43,4 +43,9 @@ public class UserService {
         return mapper.toDto(user);
     }
 
+    public String findByUsername(String name) {
+        User user = userRepository.findByUsername(name).orElseThrow(() ->
+                new ResourceNotFoundException("Foydalanuvchi topilmadi: " + name));
+        return user.getFullname();
+    }
 }

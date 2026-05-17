@@ -35,12 +35,19 @@ public class BookingService {
 
     @Transactional
     public BookingResponceDto createBooking(BookingCreateDto dto, String username){
+
         SportField sportField = sportFieldRepository.findById(dto.getFieldId()).orElseThrow(() ->
                 new ResourceNotFoundException("Maydon topilmadi: " + dto.getFieldId()));
 
         User user = userRepository.findByUsername(username).orElseThrow(() ->
                 new ResourceNotFoundException("Foydalanuvchi " + username + " topilmadi"));
 
+        LocalDateTime startTime = dto.getStartTime();
+        LocalDateTime endTime = dto.getEndTime();
+
+        if (startTime.isBefore(LocalDateTime.now().minusMinutes(5))) {
+            throw new BadRequestException("Xatolik: O'tib ketgan vaqtdan boshlab bronlay olmaysiz");
+        }
 
         if (dto.getStartTime().isAfter(dto.getEndTime()) || dto.getStartTime().equals(dto.getEndTime())) {
             throw new BadRequestException("Boshlanish vaqt tugash vaqtda oldin bo'lishi kerak");
@@ -84,5 +91,10 @@ public class BookingService {
     public List<BookingResponceDto> getActiveBookings(Long fieldId) {
         List<Booking> activeBookings = bookingRepository.findBySportFieldIdAndStatusAndEndTimeAfterOrderByStartTimeAsc(fieldId, BookingStatus.CONFIRMED, LocalDateTime.now());
         return mapper.toDtoList(activeBookings);
+    }
+
+    public List<BookingResponceDto> getBookinsByOwner(String username) {
+        List<Booking> allBookingsByOwnerUsername = bookingRepository.findAllBookingsByOwnerUsername(username);
+        return mapper.toDtoList(allBookingsByOwnerUsername);
     }
 }

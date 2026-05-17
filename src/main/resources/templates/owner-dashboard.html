@@ -1,0 +1,87 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <title>Maydon egasi paneli</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.1/font/bootstrap-icons.css">
+</head>
+<body class="bg-light">
+
+<nav class="navbar navbar-expand-lg navbar-dark bg-success shadow-sm">
+    <div class="container">
+        <a class="navbar-brand fw-bold" href="/"><i class="bi bi-shield-fill-check me-1"></i> ManaPolya</a>
+        <div class="ms-auto">
+            <a href="/" class="btn btn-outline-light btn-sm"><i class="bi bi-house-door"></i> Bosh sahifa</a>
+        </div>
+    </div>
+</nav>
+
+<div class="container my-5">
+    <div class="row g-4">
+
+        <div class="col-lg-4">
+            <div class="card border-0 shadow-sm p-3 rounded-3 bg-white">
+                <div class="d-flex justify-content-between align-items-center mb-3">
+                    <h5 class="fw-bold m-0 text-dark"><i class="bi bi-layer-forward text-success"></i> Maydonlarim</h5>
+                    <a href="/fields/create" class="btn btn-sm btn-success fw-bold">+ Yangi</a>
+                </div>
+
+                <div class="list-group list-group-flush">
+                    <div th:each="f : ${myFields}" class="list-group-item d-flex justify-content-between align-items-center px-0 py-3">
+                        <div>
+                            <h6 class="fw-bold m-0 text-dark" th:text="${f.name}"></h6>
+                            <small class="text-muted" th:text="${f.priceHour} + ' so\'m/soat'"></small>
+                        </div>
+                        <a th:href="@{/fields/{id}(id=${f.id})}" class="btn btn-sm btn-outline-secondary"><i class="bi bi-eye"></i></a>
+                    </div>
+
+                    <div th:if="${#lists.isEmpty(myFields)}" class="text-center text-muted py-4">
+                        <i class="bi bi-folder-x fs-1"></i>
+                        <p class="small m-0">Sizda hali maydonlar yo'q.</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="col-lg-8">
+            <div class="card border-0 shadow-sm p-4 rounded-3 bg-white">
+                <h5 class="fw-bold text-dark mb-4"><i class="bi bi-people-fill text-primary"></i> Kelib tushgan bronlar (Ijarachilar)</h5>
+
+                <div class="table-responsive">
+                    <table class="table table-hover table-bordered align-middle">
+                        <thead class="table-light">
+                        <tr>
+                            <th>Mijoz (FIO)</th>
+                            <th>Maydon nomi</th>
+                            <th>Boshlanish vaqti</th>
+                            <th>Tugash vaqti</th>
+                            <th>Umumiy summa</th>
+                            <th>Status</th>
+                        </tr>
+                        </thead>
+                        <tbody>
+                        <tr th:each="b : ${myBookings}">
+                            <td class="fw-bold text-secondary" th:text="${b.customerFullName}"></td>
+                            <td class="fw-medium text-dark" th:text="${b.fieldName}"></td>
+                            <td th:text="${#temporals.format(b.startTime, 'dd-MM-yyyy HH:mm')}"></td>
+                            <td th:text="${#temporals.format(b.endTime, 'dd-MM-yyyy HH:mm')}"></td>
+                            <td class="text-success fw-bold" th:text="${b.totalPrice} + ' so\'m'"></td>
+                            <td>
+                                <span class="badge bg-success" th:text="${b.status}"></span>
+                            </td>
+                        </tr>
+                        <tr th:if="${#lists.isEmpty(myBookings)}">
+                            <td colspan="6" class="text-center text-muted py-4">Sizning maydonlaringizni hali hech kim ijara olmadi.</td>
+                        </tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+
+    </div>
+</div>
+
+</body>
+</html>

@@ -80,4 +80,10 @@ public class SportFieldService {
         responceDto.setRegionName(sportField.getDistrict().getRegion().getRegionName());
         return responceDto;
     }
+
+
+    public List<SportFieldResponceDto> getFieldsByOwner(String username) {
+        List<SportField> byOwnerUsername = sportFieldRepository.findByOwnerUsername(username);
+        return mapper.toDtoList(byOwnerUsername);
+    }
 }

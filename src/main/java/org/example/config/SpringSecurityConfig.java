@@ -1,6 +1,7 @@
 package org.example.config;
 import lombok.RequiredArgsConstructor;
 import org.example.config.jwt.JwtFilter;
+import org.example.config.jwt.JwtUtil;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.core.annotation.Order;
@@ -10,6 +11,7 @@ import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
 import org.springframework.security.config.annotation.web.configurers.AbstractHttpConfigurer;
 import org.springframework.security.config.http.SessionCreationPolicy;
+import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.security.web.SecurityFilterChain;
@@ -22,7 +24,9 @@ import org.springframework.security.web.util.matcher.AntPathRequestMatcher;
 @RequiredArgsConstructor
 public class SpringSecurityConfig {
 
-    private final JwtFilter jwtFilter;
+
+    private final JwtUtil  jwtUtil;
+    private final UserDetailsService userDetailsService;
 
     @Bean
     public PasswordEncoder passwordEncoder() {
@@ -32,9 +36,13 @@ public class SpringSecurityConfig {
     @Bean
     @Order(1)
     public SecurityFilterChain apiSecurityFilterChain(HttpSecurity http) throws Exception {
+
+        JwtFilter customApiJwtFilter = new JwtFilter(jwtUtil, userDetailsService);
+
         http
                 .securityMatcher("/api/**")
                 .csrf(AbstractHttpConfigurer::disable)
+                .sessionManagement(session -> session.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
                 .authorizeHttpRequests(auth -> auth
                         .requestMatchers("/api/auth/**").permitAll()
                         .requestMatchers(HttpMethod.GET, "/api/fields", "/api/fields/**").permitAll()
@@ -53,7 +61,7 @@ public class SpringSecurityConfig {
                             response.getWriter().write("{\"error\": \"Forbidden\", \"message\": \"Sizda bu amal uchun huquq yo'q!\"}");
                         })
                 )
-                .addFilterBefore(jwtFilter, UsernamePasswordAuthenticationFilter.class);
+                .addFilterBefore(customApiJwtFilter, UsernamePasswordAuthenticationFilter.class);
 
         return http.build();
     }
@@ -78,7 +86,8 @@ public class SpringSecurityConfig {
 
                 .formLogin(form -> form
                         .loginPage("/auth/login")
-                        .defaultSuccessUrl("/",  false)
+                        .loginProcessingUrl("/auth/login")
+                        .defaultSuccessUrl("/",  true)
                         .permitAll()
                 )
                 .logout(logout -> logout

@@ -33,6 +33,7 @@ public class SportFieldResponceDto {
     private Double latitude;
     private Double longitude;
     private Double avarageRating;
+    private Integer ratingCount;
     List<ImageResponceDto> images;
     private String ownerPhone;
 

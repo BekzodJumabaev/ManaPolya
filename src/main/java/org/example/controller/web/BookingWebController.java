@@ -3,11 +3,9 @@ package org.example.controller.web;
 import lombok.RequiredArgsConstructor;
 import org.example.dto.BookingCreateDto;
 import org.example.service.BookingService;
+import org.example.service.SportFieldService;
 import org.springframework.stereotype.Controller;
-import org.springframework.web.bind.annotation.ModelAttribute;
-import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.*;
 import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 
 import java.security.Principal;
@@ -18,6 +16,7 @@ import java.security.Principal;
 public class BookingWebController {
 
     private final BookingService bookingService;
+    private final SportFieldService sportFieldService;
 
     @PostMapping("/{id}/book")
     public String bookField(
@@ -35,5 +34,19 @@ public class BookingWebController {
            redirectAttributes.addFlashAttribute("error", e.getMessage());
            return "redirect:/fields/" + id;
        }
+    }
+
+
+    @PostMapping("/{id}/rate")
+    public String rateField(@PathVariable("id") Long id,
+                            @RequestParam("stars") Integer stars,
+                            RedirectAttributes redirectAttributes) {
+        try {
+            sportFieldService.addRating(id, stars);
+            redirectAttributes.addFlashAttribute("message", "Baho muvaffaqiyatli qabul qilindi. Rahmat!");
+        } catch (Exception e) {
+            redirectAttributes.addFlashAttribute("error", e.getMessage());
+        }
+        return "redirect:/fields/" + id;
     }
 }

@@ -39,5 +39,8 @@ public interface SportFieldMapper {
     @Mapping(target = "id", ignore = true)
     @Mapping(target = "owner", ignore = true)
     @Mapping(target = "district", ignore = true)
+    @Mapping(target = "avarageRating", ignore = true)
+    @Mapping(target = "ratingCount", ignore = true)
+    @Mapping(target = "images", ignore = true)
     void updateEntityFromDto(SportFieldUpdateDto dto, @MappingTarget SportField entity);
 }

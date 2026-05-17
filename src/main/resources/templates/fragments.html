@@ -1,0 +1,203 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org" xmlns:sec="http://www.thymeleaf.org/extras/spring-security">
+<head th:fragment="header_links">
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.2/font/bootstrap-icons.min.css">
+
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/animate.css/4.1.1/animate.min.css"/>
+
+    <style>
+        :root {
+            --primary-color: #00b4d8;       /* Zamonaviy Neon Havo Rang */
+            --primary-hover: #0096c7;
+            --accent-color: #10b981;        /* Premium Yalpiz Yashil (Sport maydonlari uchun ideal) */
+            --dark-gradient: linear-gradient(135deg, #0f172a 0%, #1e293b 100%); /* To'q ko'k/kulrang premium fon */
+            --card-shadow: 0 10px 30px rgba(15, 23, 42, 0.04);
+            --hover-shadow: 0 20px 40px rgba(15, 23, 42, 0.08);
+            --font-main: 'Inter', sans-serif;
+        }
+
+        body {
+            font-family: var(--font-main);
+            background-color: #f8fafc;
+            color: #334155;
+        }
+
+        /* Navbarni daxshatli chiroyli qilish */
+        .custom-navbar {
+            background: rgba(255, 255, 255, 0.85) !important;
+            backdrop-filter: blur(20px); /* Oyna effekti */
+            -webkit-backdrop-filter: blur(20px);
+            border-bottom: 1px solid rgba(241, 245, 249, 1);
+            transition: all 0.3s ease;
+        }
+
+        .navbar-brand-premium {
+            font-weight: 800;
+            font-size: 1.4rem;
+            letter-spacing: -0.5px;
+            background: linear-gradient(45deg, #10b981, #00b4d8);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
+
+        .nav-link-premium {
+            font-weight: 500;
+            color: #475569 !important;
+            padding: 0.6rem 1.1rem !important;
+            border-radius: 8px;
+            transition: all 0.25s ease;
+            display: inline-flex;
+            align-items: center;
+        }
+
+        .nav-link-premium:hover {
+            color: var(--primary-hover) !important;
+            background-color: rgba(0, 180, 216, 0.06);
+            transform: translateY(-1px);
+        }
+
+        /* Active klassi uchun yorqin va toza yalpiz rang */
+        .nav-link-premium.active {
+            color: var(--accent-color) !important;
+            background-color: rgba(16, 185, 129, 0.08) !important;
+            font-weight: 700;
+        }
+
+        /* Profil va badjlar dizayni */
+        .user-badge {
+            background-color: #f1f5f9;
+            padding: 0.5rem 1rem;
+            border-radius: 50px;
+            font-weight: 600;
+            color: #1e293b;
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            border: 1px solid #e2e8f0;
+        }
+
+        .btn-premium-action {
+            font-weight: 600;
+            border-radius: 10px;
+            padding: 0.55rem 1.3rem;
+            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+        }
+
+        .btn-login-custom {
+            background: transparent;
+            color: #475569;
+            border: 1px solid #cbd5e1;
+        }
+
+        .btn-login-custom:hover {
+            background: #f8fafc;
+            color: #1e293b;
+            border-color: #94a3b8;
+        }
+
+        .btn-register-custom {
+            background: linear-gradient(135deg, #10b981 0%, #059669 100%);
+            color: white;
+            border: none;
+            box-shadow: 0 4px 15px rgba(16, 185, 129, 0.2);
+        }
+
+        .btn-register-custom:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 6px 20px rgba(16, 185, 129, 0.3);
+            color: white;
+        }
+    </style>
+</head>
+<body>
+
+<nav th:fragment="navbar" class="navbar navbar-expand-lg custom-navbar sticky-top py-3 animate__animated animate__fadeInDown">
+    <div class="container">
+        <a class="navbar-brand navbar-brand-premium d-flex align-items-center gap-2" th:href="@{/}">
+            <i class="bi bi-trophy-fill text-warning fs-3 animate__animated animate__bounceIn"></i>
+            <span class="fw-black">ManaPolya</span>
+        </a>
+
+        <button class="navbar-toggler border-0 shadow-none" type="button" data-bs-toggle="collapse" data-bs-target="#mainNavbar">
+            <span class="navbar-toggler-icon"></span>
+        </button>
+
+        <div class="collapse navbar-collapse" id="mainNavbar">
+            <ul class="navbar-nav me-auto mb-2 mb-lg-0 ms-lg-4 gap-1">
+                <li class="nav-item">
+                    <a class="nav-link nav-link-premium" th:href="@{/}">
+                        <i class="bi bi-compass-fill me-1.5 text-success"></i> Maydonlar qidiruvi
+                    </a>
+                </li>
+
+                <li class="nav-item" sec:authorize="isAuthenticated()">
+                    <a class="nav-link nav-link-premium" th:href="@{/profile/dashboard}">
+                        <i class="bi bi-grid-1x2-fill me-1.5 text-primary"></i> Shaxsiy Kabinet
+                    </a>
+                </li>
+            </ul>
+            <div class="d-flex align-items-center gap-3">
+
+                <div sec:authorize="isAuthenticated()" class="d-flex align-items-center gap-2">
+                    <div class="user-badge shadow-sm animate__animated animate__fadeIn">
+                        <div class="bg-success rounded-circle d-flex align-items-center justify-content-center" style="width: 28px; height: 28px;">
+                            <i class="bi bi-person-fill text-white small"></i>
+                        </div>
+                        <span th:text="${currentFullUsername ?: #authentication.name}">Foydalanuvchi</span>
+                    </div>
+
+                    <form th:action="@{/logout}" method="post" class="m-0">
+                        <button type="submit" class="btn btn-sm btn-outline-danger btn-premium-action border-0" title="Tizimdan chiqish">
+                            <i class="bi bi-box-arrow-right fs-5"></i>
+                        </button>
+                    </form>
+                </div>
+
+                <div sec:authorize="isAnonymous()" class="d-flex align-items-center gap-2 animate__animated animate__fadeIn">
+                    <a th:href="@{/auth/login}" class="btn btn-premium-action btn-login-custom">
+                        <i class="bi bi-box-arrow-in-right me-1"></i> Kirish
+                    </a>
+                    <a th:href="@{/auth/signup}" class="btn btn-premium-action btn-register-custom">
+                        <i class="bi bi-person-plus-fill me-1"></i> Ro'yxatdan o'tish
+                    </a>
+                </div>
+
+            </div>
+        </div>
+    </div>
+</nav>
+
+<footer th:fragment="footer_scripts">
+    <div class="container text-center py-4 text-muted border-top mt-5" style="font-size: 0.9rem;">
+        <p class="m-0">&copy; 2026 <span class="fw-bold text-dark">ManaPolya</span>. Barcha huquqlar himoyalangan. Professional SaaS Portfolio Project.</p>
+    </div>
+
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
+
+    <script>
+        document.addEventListener("DOMContentLoaded", function() {
+            // Brauzerdagi joriy yo'lni olamiz (Masalan: '/' yoki '/profile/dashboard')
+            const currentUrl = window.location.pathname;
+            const navLinks = document.querySelectorAll(".nav-link-premium");
+
+            navLinks.forEach(link => {
+                // Havoladagi th:href manzilini tekshiramiz
+                const hrefAttr = link.getAttribute("href");
+                if (hrefAttr === currentUrl) {
+                    link.classList.add("active");
+                }
+            });
+        });
+    </script>
+</footer>
+
+</body>
+</html>

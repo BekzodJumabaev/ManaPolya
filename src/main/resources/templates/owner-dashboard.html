@@ -1,30 +1,21 @@
 <!DOCTYPE html>
-<html xmlns:th="http://www.thymeleaf.org">
+<html xmlns:th="http://www.thymeleaf.org" xmlns:sec="http://www.thymeleaf.org/extras/spring-security">
 <head>
-    <meta charset="UTF-8">
+    <div th:replace="~{fragments :: header_links}"></div>
     <title>Shaxsiy Kabinet - ManaPolya</title>
-    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
-    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.1/font/bootstrap-icons.css">
     <style>
-        body { background-color: #f4f7f6; }
-        .card-custom { border-radius: 16px; border: none; box-shadow: 0 5px 25px rgba(0,0,0,0.04); }
-        .table-custom th { font-weight: 600; font-size: 0.85rem; text-transform: uppercase; letter-spacing: 0.5px; }
-        .btn-action { border-radius: 8px; font-weight: 500; transition: all 0.2s; }
-        .btn-action:hover { transform: translateY(-1px); }
+        .card-dashboard-premium { border-radius: 20px; border: none; box-shadow: 0 10px 35px rgba(15, 23, 42, 0.03); transition: all 0.3s ease; }
+        .card-dashboard-premium:hover { transform: translateY(-2px); box-shadow: 0 15px 40px rgba(15, 23, 42, 0.06); }
+        .premium-table th { font-weight: 700; font-size: 0.8rem; text-transform: uppercase; letter-spacing: 0.75px; color: #64748b; background-color: #f8fafc; border-bottom: 2px solid #e2e8f0; }
+        .list-group-item-premium { border: none; padding: 1.1rem 0; border-bottom: 1px solid #f1f5f9 !important; transition: all 0.2s ease; }
+        .list-group-item-premium:last-child { border-bottom: none !important; }
     </style>
 </head>
-<body>
+<body class="bg-light">
 
-<nav class="navbar navbar-expand-lg navbar-dark bg-success shadow-sm py-3">
-    <div class="container">
-        <a class="navbar-brand fw-bold fs-4" href="/"><i class="bi bi-shield-fill-check me-2"></i>ManaPolya</a>
-        <div class="ms-auto d-flex align-items-center gap-3">
-            <a href="/" class="btn btn-outline-light btn-sm btn-action px-3"><i class="bi bi-house-door me-1"></i> Bosh sahifa</a>
-        </div>
-    </div>
-</nav>
+<div th:replace="~{fragments :: navbar}"></div>
 
-<div class="container my-5">
+<div class="container my-5 pb-5">
 
     <div th:if="${message}" class="alert alert-success alert-dismissible fade show rounded-3 shadow-sm mb-4 border-0 border-start border-success border-4" role="alert">
         <div class="d-flex align-items-center">
@@ -44,43 +35,42 @@
 
     <div class="row g-4" th:if="${dashboard.isOwner}">
 
-        <div class="col-lg-4">
-            <div class="card card-custom p-3 bg-white">
+        <div class="col-lg-4 animate__animated animate__fadeInLeft">
+            <div class="card card-dashboard-premium p-4 bg-white">
                 <div class="d-flex justify-content-between align-items-center mb-3 pb-2 border-bottom">
-                    <h5 class="fw-bold m-0 text-dark"><i class="bi bi-building text-success me-2"></i>Maydonlarim</h5>
-                    <a href="/fields/create" class="btn btn-sm btn-success btn-action px-3 fw-bold">+ Yangi</a>
+                    <h5 class="fw-bold m-0 text-dark d-flex align-items-center"><i class="bi bi-building-fill text-success me-2 fs-4"></i>Maydonlarim</h5>
+                    <a href="/fields/create" class="btn btn-sm btn-success btn-premium-action btn-register-custom px-3 fw-bold">+ Yangi</a>
                 </div>
 
                 <div class="list-group list-group-flush">
-                    <div th:each="f : ${dashboard.myFields}" class="list-group-item d-flex justify-content-between align-items-center px-0 py-3 border-bottom-dashed">
+                    <div th:each="f : ${dashboard.myFields}" class="list-group-item list-group-item-premium d-flex justify-content-between align-items-center px-0">
                         <div>
-                            <h6 class="fw-bold m-0 text-dark" th:text="${f.name}"></h6>
-                            <small class="text-success fw-medium" th:text="${#numbers.formatDecimal(f.priceHour, 0, 'WHITESPACE', 0, 'POINT')} + ' so\'m/soat'"></small>
+                            <h6 class="fw-bold m-0 text-dark mb-1" th:text="${f.name}"></h6>
+                            <small class="text-success fw-semibold" th:text="${#numbers.formatDecimal(f.priceHour, 0, 'WHITESPACE', 0, 'POINT')} + ' so\'m/soat'"></small>
                         </div>
                         <div class="d-flex gap-1">
-                            <a th:href="@{/fields/{id}(id=${f.id})}" class="btn btn-sm btn-light text-secondary border btn-action" title="Ko'rish"><i class="bi bi-eye"></i></a>
-                            <a th:href="@{/fields/{id}/edit(id=${f.id})}" class="btn btn-sm btn-light text-warning border btn-action" title="Tahrirlash"><i class="bi bi-pencil"></i></a>
+                            <a th:href="@{/fields/{id}(id=${f.id})}" class="btn btn-sm btn-light text-secondary border btn-premium-action px-2.5" title="Ko'rish"><i class="bi bi-eye-fill"></i></a>
+                            <a th:href="@{/fields/{id}/edit(id=${f.id})}" class="btn btn-sm btn-light text-warning border btn-premium-action px-2.5" title="Tahrirlash"><i class="bi bi-pencil-fill"></i></a>
                             <form th:action="@{|/fields/${f.id}/delete|}" method="post" onsubmit="return confirm('Haqiqatdan ham ushbu maydonni o\'chirmoqchimisiz?');" class="d-inline">
-                                <button type="submit" class="btn btn-sm btn-light text-danger border btn-action" title="O'chirsh"><i class="bi bi-trash"></i></button>
+                                <button type="submit" class="btn btn-sm btn-light text-danger border btn-premium-action px-2.5" title="O'chirish"><i class="bi bi-trash-fill"></i></button>
                             </form>
                         </div>
                     </div>
 
                     <div th:if="${#lists.isEmpty(dashboard.myFields)}" class="text-center text-muted py-5">
                         <i class="bi bi-folder-x fs-1 text-secondary d-block mb-2"></i>
-                        <p class="small m-0 fw-medium">Sizda hali sport maydonlari yo'q.</p>
+                        <p class="small m-0 fw-semibold">Sizda hali sport maydonlari yo'q.</p>
                     </div>
                 </div>
             </div>
         </div>
-
-        <div class="col-lg-8">
-            <div class="card card-custom p-4 bg-white">
-                <h5 class="fw-bold text-dark mb-4 pb-2 border-bottom"><i class="bi bi-people-fill text-primary me-2"></i>Kelib tushgan bronlar (Ijarachilar)</h5>
+        <div class="col-lg-8 animate__animated animate__fadeInRight">
+            <div class="card card-dashboard-premium p-4 bg-white">
+                <h5 class="fw-bold text-dark mb-4 pb-2 border-bottom d-flex align-items-center"><i class="bi bi-people-fill text-primary me-2 fs-4"></i>Kelib tushgan bronlar (Ijarachilar)</h5>
 
                 <div class="table-responsive">
-                    <table class="table table-hover table-bordered align-middle table-custom m-0 border-light">
-                        <thead class="table-light text-secondary">
+                    <table class="table table-hover table-bordered align-middle m-0 border-light">
+                        <thead class="premium-table">
                         <tr>
                             <th>Mijoz (FIO)</th>
                             <th>Maydon</th>
@@ -96,13 +86,13 @@
                             <td class="fw-medium text-secondary" th:text="${b.fieldName}"></td>
                             <td class="small text-muted" th:text="${#temporals.format(b.startTime, 'dd-MM-yyyy HH:mm')}"></td>
                             <td class="small text-muted" th:text="${#temporals.format(b.endTime, 'dd-MM-yyyy HH:mm')}"></td>
-                            <td class="text-success fw-bold" th:text="${#numbers.formatDecimal(b.totalPrice, 0, 'WHITESPACE', 0, 'POINT')} + ' so\'m'"></td>
+                            <td class="text-success fw-extrabold" th:text="${#numbers.formatDecimal(b.totalPrice, 0, 'WHITESPACE', 0, 'POINT')} + ' so\'m'"></td>
                             <td class="text-center">
-                                <span class="badge rounded-pill px-3 py-2" th:classappend="${b.status.name() == 'CONFIRMED' ? 'bg-success bg-opacity-10 text-success' : 'bg-danger bg-opacity-10 text-danger'}" th:text="${b.status}"></span>
+                                <span class="badge rounded-pill px-3 py-2 fw-semibold" th:classappend="${b.status.name() == 'CONFIRMED' ? 'bg-success bg-opacity-10 text-success' : (b.status.name() == 'COMPLETED' ? 'bg-primary bg-opacity-10 text-primary' : 'bg-danger bg-opacity-10 text-danger')}" th:text="${b.status}"></span>
                             </td>
                         </tr>
                         <tr th:if="${#lists.isEmpty(dashboard.myCustomerBookings)}">
-                            <td colspan="6" class="text-center text-muted py-5fw-medium">Sizning maydonlaringizni hali hech kim ijara olmadi.</td>
+                            <td colspan="6" class="text-center text-muted py-5 fw-medium">Sizning maydonlaringizni hali hech kim ijara olmadi.</td>
                         </tr>
                         </tbody>
                     </table>
@@ -111,14 +101,14 @@
         </div>
     </div>
 
-    <div class="row" th:if="${!dashboard.isOwner}">
+    <div class="row animate__animated animate__fadeInUp" th:if="${!dashboard.isOwner}">
         <div class="col-12">
-            <div class="card card-custom p-4 bg-white">
-                <h5 class="fw-bold text-dark mb-4 pb-2 border-bottom"><i class="bi bi-clock-history text-success me-2"></i>Mening buyurtmalarim (Siz qilgan ijaralar)</h5>
+            <div class="card card-dashboard-premium p-4 bg-white">
+                <h5 class="fw-bold text-dark mb-4 pb-2 border-bottom d-flex align-items-center"><i class="bi bi-clock-history text-success me-2 fs-4"></i>Mening buyurtmalarim (Siz qilgan ijaralar)</h5>
 
                 <div class="table-responsive">
-                    <table class="table table-hover table-bordered align-middle table-custom m-0 border-light">
-                        <thead class="table-light text-secondary">
+                    <table class="table table-hover table-bordered align-middle m-0 border-light">
+                        <thead class="premium-table">
                         <tr>
                             <th>Maydon nomi</th>
                             <th>Boshlanish vaqti</th>
@@ -133,26 +123,27 @@
                             <td class="fw-bold text-dark" th:text="${b.fieldName}"></td>
                             <td class="small text-muted" th:text="${#temporals.format(b.startTime, 'dd-MM-yyyy HH:mm')}"></td>
                             <td class="small text-muted" th:text="${#temporals.format(b.endTime, 'dd-MM-yyyy HH:mm')}"></td>
-                            <td class="text-success fw-bold" th:text="${#numbers.formatDecimal(b.totalPrice, 0, 'WHITESPACE', 0, 'POINT')} + ' so\'m'"></td>
+                            <td class="text-success fw-extrabold" th:text="${#numbers.formatDecimal(b.totalPrice, 0, 'WHITESPACE', 0, 'POINT')} + ' so\'m'"></td>
                             <td class="text-center">
-                                <span class="badge rounded-pill px-3 py-2" th:classappend="${b.status.name() == 'CONFIRMED' ? 'bg-success bg-opacity-10 text-success' : 'bg-danger bg-opacity-10 text-danger'}" th:text="${b.status}"></span>
+                                <span class="badge rounded-pill px-3 py-2 fw-semibold" th:classappend="${b.status.name() == 'CONFIRMED' ? 'bg-success bg-opacity-10 text-success' : (b.status.name() == 'COMPLETED' ? 'bg-primary bg-opacity-10 text-primary' : 'bg-danger bg-opacity-10 text-danger')}" th:text="${b.status}"></span>
                             </td>
                             <td class="text-center">
                                 <form th:if="${b.status.name() == 'CONFIRMED'}"
                                       th:action="@{|/profile/bookings/${b.id}/cancel|}"
                                       method="post"
                                       onsubmit="return confirm('Haqiqatdan ham ushbu ijarani bekor qilmoqchimisiz?');">
-                                    <button type="submit" class="btn btn-sm btn-danger btn-action px-3 fw-semibold">
+                                    <button type="submit" class="btn btn-sm btn-danger btn-premium-action px-3 fw-bold shadow-sm">
                                         <i class="bi bi-x-circle me-1"></i> Ijarani bekor qilish
                                     </button>
                                 </form>
                                 <span th:if="${b.status.name() == 'CANCELLED'}" class="text-muted small fw-medium"><i class="bi bi-info-circle me-1"></i>Bekor qilingan</span>
+                                <span th:if="${b.status.name() == 'COMPLETED'}" class="text-primary small fw-medium"><i class="bi bi-check2-circle me-1"></i>Muvaffaqiyatli yakunlangan</span>
                             </td>
                         </tr>
                         <tr th:if="${#lists.isEmpty(dashboard.myOwnBookings)}">
                             <td colspan="6" class="text-center text-muted py-5">
                                 <i class="bi bi-calendar-x fs-1 d-block mb-3 text-secondary"></i>
-                                <span class="fw-medium">Sizda hozircha hech qanday faol ijaralar mavjud emas.</span>
+                                <span class="fw-medium text-secondary">Sizda hozircha hech qanday faol ijaralar mavjud emas.</span>
                             </td>
                         </tr>
                         </tbody>
@@ -164,6 +155,7 @@
 
 </div>
 
-<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+<div th:replace="~{fragments :: footer_scripts}"></div>
+
 </body>
 </html>

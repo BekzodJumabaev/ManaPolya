@@ -23,6 +23,7 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
 import org.springframework.data.jpa.domain.Specification;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
 
@@ -76,6 +77,13 @@ public class SportFieldService {
 
         List<SportFieldResponceDto> dtoList = mapper.toDtoList(fieldPage.getContent());
 
+        for (int i = 0; i < fieldPage.getContent().size(); i++) {
+            SportField entity = fieldPage.getContent().get(i);
+            SportFieldResponceDto dto = dtoList.get(i);
+            dto.setAvarageRating(entity.getAvarageRating() != null ? entity.getAvarageRating() : 0.0);
+            dto.setRatingCount(entity.getRatingCount() != null ? entity.getRatingCount() : 0);
+        }
+
         return new DataList<>(dtoList, fieldPage.getTotalElements(), fieldPage.getTotalPages());
     }
 
@@ -86,12 +94,24 @@ public class SportFieldService {
         SportFieldResponceDto responceDto = mapper.toDto(sportField);
         responceDto.setDistrictName(sportField.getDistrict().getDistrictName());
         responceDto.setRegionName(sportField.getDistrict().getRegion().getRegionName());
+
+        responceDto.setAvarageRating(sportField.getAvarageRating() != null ? sportField.getAvarageRating() : 0.0);
+        responceDto.setRatingCount(sportField.getRatingCount() != null ? sportField.getRatingCount() : 0);
+
         return responceDto;
     }
 
 
     public List<SportFieldResponceDto> getFieldsByOwner(String username) {
         List<SportField> byOwnerUsername = sportFieldRepository.findByOwnerUsername(username);
+        List<SportFieldResponceDto> dtoList = mapper.toDtoList(byOwnerUsername);
+
+        for (int i = 0; i < byOwnerUsername.size(); i++) {
+            SportField entity = byOwnerUsername.get(i);
+            SportFieldResponceDto dto = dtoList.get(i);
+            dto.setAvarageRating(entity.getAvarageRating() != null ? entity.getAvarageRating() : 0.0);
+            dto.setRatingCount(entity.getRatingCount() != null ? entity.getRatingCount() : 0);
+        }
         return mapper.toDtoList(byOwnerUsername);
     }
 
@@ -134,6 +154,34 @@ public class SportFieldService {
             throw new org.example.exceptions.BadRequestException("Siz bu maydonni o'chira olmaysiz: ");
         }
         sportField.setDeleted(true);
+        sportFieldRepository.save(sportField);
+    }
+
+    @Transactional
+    public void addRating(Long fieldId, Integer stars) {
+
+        if (stars < 1 || stars > 5) {
+            throw new BadRequestException("Xatolik: Reyting balli 1 va 5 oralig'ida bo'lishi shart ");
+        }
+
+        SportField sportField = sportFieldRepository.findById(fieldId).orElseThrow(() ->
+                new ResourceNotFoundException("Maydon topilmadi: " + fieldId));
+
+        double currentAvg = sportField.getAvarageRating() != null ? sportField.getAvarageRating() : 0.0;
+        int currentCount = sportField.getRatingCount() != null ? sportField.getRatingCount() : 0;
+
+        if (currentCount == 0){
+            sportField.setAvarageRating(stars.doubleValue());
+            sportField.setRatingCount(1);
+        }else {
+            double newTotalScore = (currentAvg * currentCount) + stars;
+            int newCount = currentCount + 1;
+            double newAvg = newTotalScore / newCount;
+
+            sportField.setAvarageRating(Math.round(newAvg * 10.0) / 10.0);
+            sportField.setRatingCount(newCount);
+        }
+
         sportFieldRepository.save(sportField);
     }
 }

@@ -20,7 +20,12 @@ public class ImageFileStorageService {
             if (Files.notExists(root)) {
                 Files.createDirectories(root);
             }
-            String fileName = UUID.randomUUID() + file.getOriginalFilename();
+            String originalFilename = file.getOriginalFilename();
+            String extension = "";
+            if (originalFilename != null && originalFilename.contains(".")) {
+                extension = originalFilename.substring(originalFilename.lastIndexOf("."));
+            }
+            String fileName = UUID.randomUUID() + extension;
             Files.copy(file.getInputStream(), this.root.resolve(fileName));
             return fileName;
         } catch (IOException e) {

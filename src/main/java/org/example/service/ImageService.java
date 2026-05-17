@@ -44,7 +44,7 @@ public class ImageService {
         List<ImageField> imageFields = new ArrayList<>();
 
         for (MultipartFile file : files) {
-            if (files != null && !file.isEmpty()) {
+            if (file != null && !file.isEmpty()) {
                 String fileName = imageFileStorageService.saveImage(file);
 
                 ImageField imageField = new ImageField();

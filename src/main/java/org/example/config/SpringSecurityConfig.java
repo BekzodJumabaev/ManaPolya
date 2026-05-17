@@ -74,7 +74,7 @@ public class SpringSecurityConfig {
                         .anyRequest().authenticated()
                 )
                 .sessionManagement(session -> session
-                        .sessionCreationPolicy(SessionCreationPolicy.IF_REQUIRED))
+                        .sessionCreationPolicy(SessionCreationPolicy.ALWAYS))
 
                 .formLogin(form -> form
                         .loginPage("/auth/login")

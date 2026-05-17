@@ -1,5 +1,6 @@
 package org.example.controller.web;
 
+import jakarta.validation.Valid;
 import lombok.Getter;
 import lombok.RequiredArgsConstructor;
 import org.example.dto.SportFieldCreateDto;
@@ -9,6 +10,7 @@ import org.example.service.ImageService;
 import org.example.service.SportFieldService;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
+import org.springframework.validation.BindingResult;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 
@@ -33,11 +35,16 @@ public class SportFieldWebController {
     }
 
     @PostMapping("/create")
-    public String saveField(
-                            @ModelAttribute("fieldDto") SportFieldCreateDto dto,
+    public String saveField(@Valid @ModelAttribute("fieldDto") SportFieldCreateDto dto,
+                            BindingResult bindingResult,
                             @RequestParam("images") List<MultipartFile> images,
                                                     Principal principal,
                                                     Model model){
+
+        if (bindingResult.hasErrors()){
+            model.addAttribute("regions", regionRepository.findAll());
+            return "create-field";
+        }
 
         try {
             String currentUsername = principal.getName();

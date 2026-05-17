@@ -1,5 +1,6 @@
 package org.example.service;
 
+import jdk.dynalink.linker.LinkerServices;
 import lombok.RequiredArgsConstructor;
 import org.example.dto.BookingCreateDto;
 import org.example.dto.BookingResponceDto;
@@ -19,7 +20,9 @@ import org.springframework.transaction.annotation.Transactional;
 import java.math.BigDecimal;
 import java.math.RoundingMode;
 import java.time.Duration;
+import java.time.LocalDateTime;
 import java.time.LocalTime;
+import java.util.List;
 
 @Service
 @RequiredArgsConstructor
@@ -76,5 +79,10 @@ public class BookingService {
         responceDto.setFieldName(sportField.getName());
         responceDto.setCustomerFullName(user.getFullname());
         return responceDto;
+    }
+
+    public List<BookingResponceDto> getActiveBookings(Long fieldId) {
+        List<Booking> activeBookings = bookingRepository.findBySportFieldIdAndStatusAndEndTimeAfterOrderByStartTimeAsc(fieldId, BookingStatus.CONFIRMED, LocalDateTime.now());
+        return mapper.toDtoList(activeBookings);
     }
 }

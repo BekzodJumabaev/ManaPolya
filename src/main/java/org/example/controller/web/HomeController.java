@@ -1,9 +1,11 @@
 package org.example.controller.web;
 
 import lombok.RequiredArgsConstructor;
+import org.example.dto.BookingResponceDto;
 import org.example.dto.SportFieldResponceDto;
 import org.example.dto.SportFileldSearchDto;
 import org.example.repository.RegionRepository;
+import org.example.service.BookingService;
 import org.example.service.DistrictService;
 import org.example.service.SportFieldService;
 import org.example.utils.DataList;
@@ -22,6 +24,7 @@ public class HomeController {
     private final SportFieldService sportFieldService;
     private final RegionRepository regionRepository;
     private final DistrictService districtService;
+    private final BookingService bookingService;
 
     @GetMapping("/")
     public String homePage(
@@ -59,7 +62,11 @@ public class HomeController {
     @GetMapping("/fields/{id}")
     public String fieldDetails(@PathVariable("id") long id, Model model){
         SportFieldResponceDto dto = sportFieldService.getById(id);
+
+        List<BookingResponceDto> occupiedSlots = bookingService.getActiveBookings(id);
+
         model.addAttribute("field", dto);
+        model.addAttribute("occupiedSlots", occupiedSlots);
         return "details";
     }
 }

@@ -14,6 +14,7 @@ public interface SportFieldMapper {
 
     @Mapping(target = "districtName", source = "district.districtName")
     @Mapping(target = "regionName", source = "district.region.regionName")
+    @Mapping(target = "ownerPhone", source = "owner.phoneNumber")
     SportFieldResponceDto toDto(SportField sportField);
 
     List<SportFieldResponceDto> toDtoList(List<SportField> sportFields);

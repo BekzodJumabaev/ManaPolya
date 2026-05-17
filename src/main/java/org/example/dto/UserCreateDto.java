@@ -36,6 +36,5 @@ public class UserCreateDto {
     @Pattern(regexp = "^\\+998\\d{9}$", message = "Telofon raqam +998******** formada bo'lishi kerak")
     private String phoneNumber;
 
-    @NotNull(message = "Rol tanlanishi kerak")
     private UserRole role;
 }

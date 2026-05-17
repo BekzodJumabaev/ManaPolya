@@ -32,4 +32,8 @@ public interface BookingRepository extends JpaRepository<Booking, Long> {
 
     @Query("select b from Booking b where b.sportField.owner.username = :username ORDER BY b.startTime DESC")
     List<Booking> findAllBookingsByOwnerUsername(@Param("username") String username);
+
+    List<Booking> findByCustomerUsernameOrderByStartTimeDesc(String username);
+
+    List<Booking> findByStatusAndEndTimeBefore(BookingStatus bookingStatus, LocalDateTime now);
 }

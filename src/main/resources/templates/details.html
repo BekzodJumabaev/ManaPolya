@@ -20,6 +20,7 @@
 </nav>
 
 <div class="container pb-5">
+
     <div th:if="${message}" class="alert alert-success alert-dismissible fade show rounded-3 shadow-sm" role="alert">
         <i class="bi bi-check-circle-fill me-2"></i> <span th:text="${message}"></span>
         <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
@@ -59,7 +60,6 @@
             </div>
 
             <img th:if="${#lists.isEmpty(field.images)}" src="https://via.placeholder.com/800x450?text=Rasm+Mavjud+Emas" class="w-100 details-img shadow-sm mb-4">
-            <img th:if="${#lists.isEmpty(field.images)}" src="https://via.placeholder.com/800x450?text=No+Image" class="w-100 details-img shadow-sm mb-4">
 
             <div class="card border-0 shadow-sm p-4 rounded-3 mb-4">
                 <div class="d-flex justify-content-between align-items-start mb-2">
@@ -80,7 +80,6 @@
                 </p>
                 <hr class="text-muted my-3">
 
-                <hr class="text-muted my-3">
                 <h5 class="fw-bold text-secondary mb-3"><i class="bi bi-telephone-outbound text-success me-1"></i> Maydon egasi bilan bog'lanish</h5>
                 <div class="p-3 bg-light rounded-3 d-flex align-items-center justify-content-between border">
                     <div>
@@ -107,15 +106,14 @@
 
                 <h5 class="fw-bold text-secondary mb-3">Qulayliklar</h5>
                 <div class="d-flex gap-3">
-    <span class="slot-badge bg-light border text-dark fw-medium">
-        <i class="bi bi-brightness-high-fill text-warning me-1"></i>
-        Tungi yoritgich: <span th:text="${field.hasLight ? 'Bor' : 'Yo''q'}"></span>
-    </span>
-
                     <span class="slot-badge bg-light border text-dark fw-medium">
-        <i class="bi bi-droplet-fill text-primary me-1"></i>
-        Dush xonasi: <span th:text="${field.hasShower ? 'Bor' : 'Yo''q'}"></span>
-    </span>
+                        <i class="bi bi-brightness-high-fill text-warning me-1"></i>
+                        Tungi yoritgich: <span th:text="${field.hasLight ? 'Bor' : 'Yo''q'}"></span>
+                    </span>
+                    <span class="slot-badge bg-light border text-dark fw-medium">
+                        <i class="bi bi-droplet-fill text-primary me-1"></i>
+                        Dush xonasi: <span th:text="${field.hasShower ? 'Bor' : 'Yo''q'}"></span>
+                    </span>
                 </div>
             </div>
         </div>
@@ -137,6 +135,13 @@
                     </div>
 
                     <button type="submit" class="btn btn-success btn-lg w-100 fw-bold rounded-3 shadow-sm mb-4"><i class="bi bi-lightning-charge-fill me-1"></i> Bron qilishni tasdiqlash</button>
+
+                    <div id="priceCalcPanel" class="p-3 bg-success bg-opacity-10 border border-success border-dashed rounded-3 mb-3 text-center d-none">
+                        <span class="text-secondary small d-block">Siz tanlagan vaqt uchun umumiy summa:</span>
+                        <h4 class="fw-bold text-success m-0" id="livePrice">0 so'm</h4>
+                        <small class="text-muted" id="liveHours">(0 soat)</small>
+                    </div>
+
                 </form>
 
                 <div class="mt-2">
@@ -149,7 +154,7 @@
                     <div th:if="${not #lists.isEmpty(occupiedSlots)}" class="d-flex flex-wrap gap-2" style="max-height: 150px; overflow-y: auto; padding: 5px;">
                         <span th:each="slot : ${occupiedSlots}" class="slot-badge bg-danger bg-opacity-10 text-danger border border-danger border-opacity-20 fw-bold">
                             <i class="bi bi-lock-fill me-1"></i>
-                            <span th:text="${#temporals.format(slot.startTime, 'dd-MMM, HH:mm')}"></span> dan
+                            <span th:text="${#temporals.format(slot.startTime, 'dd-MM, HH:mm')}"></span> dan
                             <span th:text="${#temporals.format(slot.endTime, 'HH:mm')}"></span> gacha
                         </span>
                     </div>
@@ -168,13 +173,10 @@
         const bookingForm = document.getElementById("bookingForm");
 
         /**
-         * 1. MINIMAL SANANI SOZLACH: Foydalanuvchi o'tmishdagi vaqtni tanlay olmasligi kerak
-         * datetime-local inputi uchun format: YYYY-MM-DDTHH:mm
+         * 1. MINIMAL SANANI SOZLACH: Sekundlar xato bermasligi uchun faqat toza minutgacha chegaralash
          */
         function updateMinDateTime() {
             const now = new Date();
-
-            // Vaqt zonasini hisobga olgan holda formatlash (+05:00 O'zbekiston uchun)
             const year = now.getFullYear();
             const month = String(now.getMonth() + 1).padStart(2, '0');
             const day = String(now.getDate()).padStart(2, '0');
@@ -183,24 +185,20 @@
 
             const currentDateTimeStr = `${year}-${month}-${day}T${hours}:${minutes}`;
 
-            // Inputlarga minimal chegara qo'yamiz
+            // O'tmish sekundlari backend bilan urishmasligi uchun minimallarni o'rnatamiz
             startTimeInput.min = currentDateTimeStr;
             endTimeInput.min = currentDateTimeStr;
         }
 
-        // Sahifa yuklanganda chegarani o'rnatamiz
         updateMinDateTime();
-        // Har daqiqada vaqtni yangilab turamiz
         setInterval(updateMinDateTime, 60000);
 
         /**
-         * 2. DINAMIK ZANJIR: Boshlanish vaqti tanlanganda, tugash vaqtini avtomat minimal +1 soat qilib sozlash
+         * 2. DINAMIK AUTOMATIC SURISH: Boshlanish tanlansa tugash srazu +1 soat minimal bo'ladi
          */
         startTimeInput.addEventListener("change", function () {
             if (startTimeInput.value) {
                 const startDate = new Date(startTimeInput.value);
-
-                // Kamida 1 soat bo'lishi shartligi uchun +1 soat qo'shamiz
                 startDate.setHours(startDate.getHours() + 1);
 
                 const year = startDate.getFullYear();
@@ -211,7 +209,6 @@
 
                 endTimeInput.min = `${year}-${month}-${day}T${hours}:${minutes}`;
 
-                // Agar tugash vaqti boshlanishdan oldin qolib ketgan bo'lsa, uni ham avtomat suradi
                 if (!endTimeInput.value || new Date(endTimeInput.value) < startDate) {
                     endTimeInput.value = endTimeInput.min;
                 }
@@ -219,28 +216,27 @@
         });
 
         /**
-         * 3. FRONT-END VALIDATION: Formani yuborishdan oldin mantiqiy xatolarni tekshirish
+         * 3. PROFESSIONAL JS VALIDATION: Backendga borishdan oldin sekundlarni dynamic bufferini tekshirish
          */
         bookingForm.addEventListener("submit", function (event) {
             const start = new Date(startTimeInput.value);
             const end = new Date(endTimeInput.value);
-            const now = new Date();
 
-            // O'tmishni tekshirish
-            if (start < now) {
+            // 15 daqiqalik dynamic buffer (orqaga qaytish kechikishlarini oldini oladi)
+            const nowWithBuffer = new Date(Date.now() - 15 * 60000);
+
+            if (start < nowWithBuffer) {
                 alert("Xatolik: O'tmishdagi vaqtga bron buyurtma qilib bo'lmaydi!");
                 event.preventDefault();
                 return;
             }
 
-            // Boshlanish va tugash mantiqi
             if (start >= end) {
                 alert("Xatolik: Tugash vaqti boshlanish vaqtidan keyin bo'lishi shart!");
                 event.preventDefault();
                 return;
             }
 
-            // 1 soatlik minimal muddat cheklovi
             const diffInMinutes = (end - start) / 1000 / 60;
             if (diffInMinutes < 60) {
                 alert("Xatolik: Sport maydonini kamida 1 soatga (60 daqiqa) bron qilishingiz kerak!");
@@ -249,6 +245,34 @@
             }
         });
     });
+
+    const pricePerHour = /*[[${field.priceHour}]]*/ 0;
+    const startTimeInput = document.getElementById("startTime");
+    const endTimeInput = document.getElementById("endTime");
+    const priceCalcPanel = document.getElementById("priceCalcPanel");
+    const livePrice = document.getElementById("livePrice");
+    const liveHours = document.getElementById("liveHours");
+
+    function updateLivePrice() {
+        if (startTimeInput.value && endTimeInput.value) {
+            const start = new Date(startTimeInput.value);
+            const end = new Date(endTimeInput.value);
+
+            if (end > start) {
+                const diffMinutes = (end - start) / 1000 / 60;
+                const hours = diffMinutes / 60;
+                const total = hours * pricePerHour;
+
+                priceCalcPanel.classList.remove("d-none");
+                livePrice.innerText = total.toLocaleString() + " so'm";
+                liveHours.innerText = `(${hours.toFixed(1)} soat uchun)`;
+                return;
+            }
+        }
+        priceCalcPanel.classList.add("d-none");
+    }
+    startTimeInput.addEventListener("change", updateLivePrice);
+    endTimeInput.addEventListener("change", updateLivePrice);
 </script>
 
 </body>

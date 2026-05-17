@@ -3,10 +3,13 @@ package org.example.service;
 import lombok.RequiredArgsConstructor;
 import org.example.dto.SportFieldCreateDto;
 import org.example.dto.SportFieldResponceDto;
+import org.example.dto.SportFieldUpdateDto;
 import org.example.dto.SportFileldSearchDto;
 import org.example.entity.District;
 import org.example.entity.SportField;
 import org.example.entity.User;
+import org.example.enums.UserRole;
+import org.example.exceptions.BadRequestException;
 import org.example.exceptions.ResourceNotFoundException;
 import org.example.mapper.SportFieldMapper;
 import org.example.repository.DistrictRepository;
@@ -39,6 +42,11 @@ public class SportFieldService {
 
         User owner = userRepository.findByUsername(currentUsername).orElseThrow(() ->
                 new ResourceNotFoundException("Foydalanuvchi topilmadi: " + currentUsername));
+
+        if (owner.getRole() == UserRole.CUSTOMER || owner.getRole() == null) {
+            owner.setRole(UserRole.OWNER);
+            userRepository.save(owner);
+        }
 
         SportField sportField = mapper.toEntity(dto);
         sportField.setDistrict(district);
@@ -85,5 +93,47 @@ public class SportFieldService {
     public List<SportFieldResponceDto> getFieldsByOwner(String username) {
         List<SportField> byOwnerUsername = sportFieldRepository.findByOwnerUsername(username);
         return mapper.toDtoList(byOwnerUsername);
+    }
+
+
+    public SportFieldResponceDto update(long id, SportFieldUpdateDto dto, String currentUsername) {
+
+        SportField sportField = sportFieldRepository.findById(id).orElseThrow(() ->
+                new ResourceNotFoundException("Maydon topilmadi: " + id));
+
+        if (!sportField.getOwner().getUsername().equals(currentUsername)) {
+            throw new BadRequestException("Siz bu maydonni tahrirlay olmaysix");
+        }
+
+        District district = districtRepository.findById(dto.getDistrictId()).orElseThrow(() ->
+                new ResourceNotFoundException("Tuman topilmadi" + dto.getDistrictId()));
+
+        mapper.updateEntityFromDto(dto, sportField);
+        sportField.setDistrict(district);
+
+        SportField updateEntity = sportFieldRepository.save(sportField);
+
+        SportFieldResponceDto responceDto = mapper.toDto(updateEntity);
+        responceDto.setDistrictName(district.getDistrictName());
+        responceDto.setRegionName(district.getRegion().getRegionName());
+        return responceDto;
+    }
+
+
+    public SportFieldUpdateDto getForUpdate(Long id) {
+        SportField sportField = sportFieldRepository.findById(id).orElseThrow(() ->
+                new ResourceNotFoundException("Maydon topilmadi: " + id));
+        return mapper.toUpdateDto(sportField);
+    }
+
+    public void delete(Long id, String username) {
+        SportField sportField = sportFieldRepository.findById(id).orElseThrow(() ->
+                new ResourceNotFoundException("Maydon topilmadi: " + id));
+
+        if (!sportField.getOwner().getUsername().equals(username)) {
+            throw new org.example.exceptions.BadRequestException("Siz bu maydonni o'chira olmaysiz: ");
+        }
+        sportField.setDeleted(true);
+        sportFieldRepository.save(sportField);
     }
 }

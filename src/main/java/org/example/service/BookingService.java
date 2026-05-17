@@ -14,6 +14,7 @@ import org.example.mapper.BookingMapper;
 import org.example.repository.BookingRepository;
 import org.example.repository.SportFieldRepository;
 import org.example.repository.UserRepository;
+import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -42,29 +43,42 @@ public class BookingService {
         User user = userRepository.findByUsername(username).orElseThrow(() ->
                 new ResourceNotFoundException("Foydalanuvchi " + username + " topilmadi"));
 
-        LocalDateTime startTime = dto.getStartTime();
-        LocalDateTime endTime = dto.getEndTime();
+        LocalDateTime startTime = dto.getStartTime().withSecond(0).withNano(0);
+        LocalDateTime endTime = dto.getEndTime().withSecond(0).withNano(0);
 
-        if (startTime.isBefore(LocalDateTime.now().minusMinutes(5))) {
+        if (startTime.isBefore(LocalDateTime.now().withSecond(0).withNano(0).minusMinutes(5))) {
             throw new BadRequestException("Xatolik: O'tib ketgan vaqtdan boshlab bronlay olmaysiz");
         }
 
-        if (dto.getStartTime().isAfter(dto.getEndTime()) || dto.getStartTime().equals(dto.getEndTime())) {
+        if (startTime.isAfter(endTime) || startTime.isEqual(endTime)){
             throw new BadRequestException("Boshlanish vaqt tugash vaqtda oldin bo'lishi kerak");
         }
 
         LocalTime bookingStart = dto.getStartTime().toLocalTime();
         LocalTime bookingEnd = dto.getEndTime().toLocalTime();
+        LocalTime openTime = sportField.getOpenTime();
+        LocalTime closeTime = sportField.getCloseTime();
 
-        if (bookingStart.isBefore(sportField.getOpenTime()) || bookingEnd.isAfter(sportField.getCloseTime())) {
+        boolean isValidTime = false;
+        if (closeTime.isAfter(openTime)) {
+            if (!bookingStart.isBefore(openTime) && !bookingEnd.isAfter(closeTime)) {
+                isValidTime = true;
+            }
+        } else {
+            if ((!bookingStart.isBefore(openTime) || bookingStart.isBefore(closeTime)) &&
+                    (!bookingEnd.isBefore(openTime) || bookingEnd.isBefore(closeTime))) {
+                isValidTime = true;
+            }
+        }
+        if (!isValidTime) {
             throw new BadRequestException("Tanlangan vaqt maydonning ish vaqtiga to'g'ri kelmaydi! " +
-                    "Ish vaqti: " +sportField.getOpenTime() + " - " + sportField.getCloseTime());
+                    "Maydon ish vaqti: " + openTime + " - " + closeTime);
         }
 
-        if (bookingRepository.existsOverLappingBooking(dto.getFieldId(), dto.getStartTime(), dto.getEndTime())) {
-            throw new BadRequestException("Bu vaqt oralig'i band: ");
+        if (bookingRepository.existsOverLappingBooking(dto.getFieldId(), startTime, endTime)) {
+            throw new BadRequestException("Kechirasiz bu vaqt oralig'i band qilingan:");
         }
-        long minutes = Duration.between(dto.getStartTime(), dto.getEndTime()).toMinutes();
+        long minutes = Duration.between(startTime, endTime).toMinutes();
         if (minutes < 60) throw new BadRequestException("Bron kamida 1 soat bo'lishi kerak: ");
 
         BigDecimal hours = BigDecimal.valueOf(minutes).divide(BigDecimal.valueOf(60), 2, RoundingMode.HALF_UP);
@@ -96,5 +110,46 @@ public class BookingService {
     public List<BookingResponceDto> getBookinsByOwner(String username) {
         List<Booking> allBookingsByOwnerUsername = bookingRepository.findAllBookingsByOwnerUsername(username);
         return mapper.toDtoList(allBookingsByOwnerUsername);
+    }
+
+    public List<BookingResponceDto> getBookinsByCustomer(String username) {
+        List<Booking> customerBookings = bookingRepository.findByCustomerUsernameOrderByStartTimeDesc(username);
+        return mapper.toDtoList(customerBookings);
+    }
+
+    public void cancelBooking(Long bookingId, String username) {
+        Booking booking = bookingRepository.findById(bookingId).orElseThrow(() ->
+                new ResourceNotFoundException("Ijara topilmadi: " + bookingId));
+
+        if (!booking.getCustomer().getUsername().equals(username) &&
+            !booking.getSportField().getOwner().getUsername().equals(username)) {
+            throw new BadRequestException("Xatolik: Siz bu ijarani bekor qilish huquqiga ega emassiz");
+        }
+
+        LocalDateTime now = LocalDateTime.now();
+
+        long oyinBoshlanishgachaQolganVaqt = Duration.between(now, booking.getStartTime()).toMinutes();
+        long ijaraYaratilgandanHozirgachaVaqt = Duration.between(booking.getCreateAt(), now).toMinutes();
+
+        if (oyinBoshlanishgachaQolganVaqt < 30) {
+            if (ijaraYaratilgandanHozirgachaVaqt >10) {
+                throw new BadRequestException("Xatolik: O'yin boshlanishiga 30 daqiqadan kam vaqt qoldi! " +
+                        "Ushbu ijarani endi bekor qilib bo'lmaydi.");
+            }
+        }
+        booking.setStatus(BookingStatus.CANCELLED);
+        bookingRepository.save(booking);
+    }
+
+    @Scheduled(cron = "0 */15 * * * *")
+    @Transactional
+    public void autoCompletePastBookings() {
+        List<Booking> pastBookings = bookingRepository.findByStatusAndEndTimeBefore(
+                BookingStatus.CONFIRMED, LocalDateTime.now());
+
+        for (Booking booking : pastBookings) {
+            booking.setStatus(BookingStatus.COMPLETED);
+        }
+        bookingRepository.saveAll(pastBookings);
     }
 }

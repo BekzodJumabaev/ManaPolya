@@ -75,7 +75,6 @@ public class SpringSecurityConfig {
 
                         .requestMatchers("/fields/create").authenticated()
                         .requestMatchers("/fields/*/book").authenticated()
-                        .requestMatchers("/owner/**").authenticated()
                         .requestMatchers("/profile/**").authenticated()
                         .anyRequest().authenticated()
                 )

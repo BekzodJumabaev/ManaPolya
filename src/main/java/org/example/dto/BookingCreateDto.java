@@ -14,7 +14,10 @@ import java.time.LocalDateTime;
 @NoArgsConstructor
 public class BookingCreateDto {
     private Long fieldId;
+
     @DateTimeFormat(iso = DateTimeFormat.ISO.DATE_TIME)
     private LocalDateTime startTime;
+
+    @DateTimeFormat(iso = DateTimeFormat.ISO.DATE_TIME)
     private LocalDateTime endTime;
 }

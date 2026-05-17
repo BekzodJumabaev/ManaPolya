@@ -2,9 +2,11 @@ package org.example.mapper;
 
 import org.example.dto.SportFieldCreateDto;
 import org.example.dto.SportFieldResponceDto;
+import org.example.dto.SportFieldUpdateDto;
 import org.example.entity.SportField;
 import org.mapstruct.Mapper;
 import org.mapstruct.Mapping;
+import org.mapstruct.MappingTarget;
 
 import java.util.List;
 
@@ -29,4 +31,13 @@ public interface SportFieldMapper {
     @Mapping(target = "ratingCount", ignore = true)
     @Mapping(target = "images", ignore = true)
     SportField toEntity(SportFieldCreateDto createDto);
+
+
+    @Mapping(source = "district.id", target = "districtId")
+    SportFieldUpdateDto toUpdateDto(SportField entity);
+
+    @Mapping(target = "id", ignore = true)
+    @Mapping(target = "owner", ignore = true)
+    @Mapping(target = "district", ignore = true)
+    void updateEntityFromDto(SportFieldUpdateDto dto, @MappingTarget SportField entity);
 }

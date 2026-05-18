@@ -144,6 +144,7 @@
                     </a>
                 </li>
             </ul>
+
             <div class="d-flex align-items-center gap-3">
 
                 <div sec:authorize="isAuthenticated()" class="d-flex align-items-center gap-2">
@@ -151,7 +152,9 @@
                         <div class="bg-success rounded-circle d-flex align-items-center justify-content-center" style="width: 28px; height: 28px;">
                             <i class="bi bi-person-fill text-white small"></i>
                         </div>
-                        <span th:text="${currentFullUsername ?: #authentication.name}">Foydalanuvchi</span>
+
+                        <span th:if="${currentFullUsername != null}" th:text="${currentFullUsername}"></span>
+                        <span th:if="${currentFullUsername == null}" sec:authentication="name"></span>
                     </div>
 
                     <form th:action="@{/logout}" method="post" class="m-0">
@@ -184,12 +187,10 @@
 
     <script>
         document.addEventListener("DOMContentLoaded", function() {
-            // Brauzerdagi joriy yo'lni olamiz (Masalan: '/' yoki '/profile/dashboard')
             const currentUrl = window.location.pathname;
             const navLinks = document.querySelectorAll(".nav-link-premium");
 
             navLinks.forEach(link => {
-                // Havoladagi th:href manzilini tekshiramiz
                 const hrefAttr = link.getAttribute("href");
                 if (hrefAttr === currentUrl) {
                     link.classList.add("active");

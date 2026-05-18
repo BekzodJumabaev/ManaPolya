@@ -1,220 +1,199 @@
 <!DOCTYPE html>
 <html xmlns:th="http://www.thymeleaf.org" xmlns:sec="http://www.thymeleaf.org/extras/spring-security">
 <head>
-    <div th:replace="~{fragments :: header_links}"></div>
-    <title>Bosh sahifa - ManaPolya</title>
+    <meta charset="UTF-8">
+    <title>ManaPolya - Asosiy</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.1/font/bootstrap-icons.css">
 
     <style>
-        .search-hero {
-            background: var(--dark-gradient);
-            padding: 5rem 0;
-            border-radius: 0 0 32px 32px;
-            box-shadow: 0 15px 30px rgba(15, 23, 42, 0.05);
-            margin-bottom: 4rem;
-        }
-        .search-container-premium {
-            background: rgba(255, 255, 255, 0.1);
-            backdrop-filter: blur(10px);
-            -webkit-backdrop-filter: blur(10px);
-            padding: 1.5rem;
-            border-radius: 20px;
-            border: 1px solid rgba(255, 255, 255, 0.15);
-        }
-        .premium-input {
-            border-radius: 12px !important;
-            padding: 0.75rem 1.2rem;
-            border: 1px solid #e2e8f0;
-            font-weight: 500;
-        }
-        .premium-input:focus {
-            border-color: var(--primary-color);
-            box-shadow: 0 0 0 4px rgba(0, 180, 216, 0.15);
-        }
-        .btn-search-premium {
-            background: linear-gradient(135deg, #00b4d8 0%, #0077b6 100%);
-            color: white;
+        body { background-color: #f4f7f6; }
+        .hudud-btn {
+            background-color: #198754 !important;
+            color: white !important;
+            border-radius: 8px;
+            font-weight: 600;
+            padding: 8px 18px;
             border: none;
-            border-radius: 12px !important;
-            padding: 0.75rem 2rem;
-            font-weight: 600;
-            transition: all 0.25s ease;
+            transition: all 0.2s;
         }
-        .btn-search-premium:hover {
-            transform: translateY(-1px);
-            box-shadow: 0 8px 20px rgba(0, 180, 216, 0.3);
-            color: white;
+        .hudud-btn:hover {
+            background-color: #146c43 !important;
         }
-        .section-title {
-            font-weight: 800;
-            letter-spacing: -0.75px;
-            color: #0f172a;
-            position: relative;
-            margin-bottom: 2.5rem;
+        .hudud-dropdown-menu {
+            width: 280px;
+            max-height: 380px;
+            overflow-y: auto;
+            border-radius: 12px;
+            box-shadow: 0 8px 24px rgba(0,0,0,0.12);
+            border: 1px solid #e9ecef;
+            padding: 8px;
         }
-        .section-title::after {
-            content: '';
-            position: absolute;
-            bottom: -8px;
-            left: 0;
-            width: 60px;
-            height: 4px;
-            background: var(--accent-color);
-            border-radius: 2px;
+        .hudud-item {
+            padding: 10px 12px;
+            font-size: 0.95rem;
+            color: #212529;
+            cursor: pointer;
+            border-radius: 6px;
+            transition: all 0.15s;
+            display: flex;
+            align-items: center;
         }
-        .badge-rating-premium {
-            background: rgba(255, 255, 255, 0.95);
-            backdrop-filter: blur(5px);
-            border: 1px solid #f1f5f9;
-            color: #0f172a;
-            font-weight: 700;
-            box-shadow: 0 4px 12px rgba(15, 23, 42, 0.06);
+        .hudud-item:hover {
+            background-color: #f8f9fa;
+            color: #198754;
         }
-        .badge-type-premium {
-            background: rgba(16, 185, 129, 0.9);
-            color: white;
-            font-weight: 600;
-            letter-spacing: 0.5px;
+        .hudud-header-btn {
+            color: #198754;
+            font-weight: bold;
+            cursor: pointer;
+            padding: 8px;
+            display: flex;
+            align-items: center;
+            gap: 6px;
+            font-size: 0.9rem;
         }
-        .price-text {
-            font-size: 1.35rem;
-            font-weight: 800;
-            color: var(--accent-color);
+        .card-custom {
+            border-radius: 16px;
+            border: none;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.03);
+            transition: all 0.3s;
+            overflow: hidden;
+        }
+        .card-custom:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 12px 25px rgba(0,0,0,0.08) !important;
+        }
+        .search-box {
+            border-radius: 12px;
+            overflow: hidden;
+            box-shadow: 0 8px 25px rgba(0,0,0,0.04);
         }
     </style>
 </head>
 <body>
 
-<div th:replace="~{fragments :: navbar}"></div>
-
-<div class="search-hero animate__animated animate__fadeIn">
+<nav class="navbar navbar-expand-lg navbar-dark bg-success shadow-sm mb-5 py-3">
     <div class="container">
-        <div class="row justify-content-center text-center mb-4">
-            <div class="col-lg-8">
-                <h1 class="text-white fw-extrabold display-5 mb-2" style="letter-spacing: -1px;">O'zingizga mos mukammal maydonni toping</h1>
-                <p class="text-white text-opacity-75 fw-medium">Viloyat, tuman yoki kalit so'zlar bo'yicha real vaqtda stadionlar qidiruvi</p>
-            </div>
-        </div>
+        <a class="navbar-brand fw-bold fs-4" href="/"><i class="bi bi-trophy-fill me-2"></i>ManaPolya</a>
 
-        <div class="row justify-content-center">
-            <div class="col-lg-9">
-                <form th:action="@{/}" method="get" class="search-container-premium">
-                    <input type="hidden" name="regionId" th:value="${selectedRegionId}">
-                    <input type="hidden" name="districtId" th:value="${selectedDistrictId}">
-
-                    <div class="row g-3">
-                        <div class="col-md-4">
-                            <div class="dropdown h-100">
-                                <button class="btn btn-light w-100 h-100 dropdown-toggle premium-input d-flex align-items-center justify-content-between text-start"
-                                        type="button" id="hududDropdownBtn" data-bs-toggle="dropdown" data-bs-auto-close="outside">
-                                    <span><i class="bi bi-geo-alt-fill text-danger me-2"></i> <span th:text="${currentRegionName} ?: 'Butun O\'zbekiston'">Butun O'zbekiston</span></span>
-                                </button>
-                                <div class="dropdown-menu hudud-dropdown-menu p-2 border-0 shadow" aria-labelledby="hududDropdownBtn" id="hududContainer">
-                                    <div class="hudud-item fw-bold text-success p-2" onclick="selectLocation(null, null)">
-                                        <i class="bi bi-globe me-2"></i> Butun O'zbekiston
-                                    </div>
-                                    <hr class="my-1 opacity-50">
-                                    <div th:each="region : ${regions}"
-                                         class="hudud-item region-selector-item d-flex justify-content-between align-items-center p-2"
-                                         th:data-id="${region.id}"
-                                         th:data-name="${region.regionName}">
-                                        <span th:text="${region.regionName}">Viloyat</span>
-                                        <i class="bi bi-chevron-right text-muted small"></i>
-                                    </div>
-                                </div>
-                            </div>
-                        </div>
-
-                        <div class="col-md-5">
-                            <div class="input-group h-100">
-                                <span class="input-group-text bg-white border-end-0 premium-input text-muted" style="border-radius: 12px 0 0 12px !important;"><i class="bi bi-search"></i></span>
-                                <input type="text" name="search" th:value="${search}" class="form-control border-start-0 premium-input" style="border-radius: 0 12px 12px 0 !important;" placeholder="Maydon nomi yoki kalit so'z...">
-                            </div>
-                        </div>
-
-                        <div class="col-md-3">
-                            <button type="submit" class="btn btn-search-premium w-100 h-100">
-                                <i class="bi bi-sliders me-2"></i> Qidirish
-                            </button>
-                        </div>
+        <div class="d-flex align-items-center gap-3">
+            <div class="dropdown">
+                <button class="btn hudud-btn dropdown-toggle shadow-sm" type="button" id="hududDropdownBtn" data-bs-toggle="dropdown" data-bs-auto-close="outside" aria-expanded="false">
+                    <i class="bi bi-geo-alt-fill me-1"></i> <span th:text="${currentRegionName} ?: 'Butun O\'zbekiston'">Butun O'zbekiston</span>
+                </button>
+                <div class="dropdown-menu hudud-dropdown-menu" aria-labelledby="hududDropdownBtn" id="hududContainer">
+                    <div class="hudud-item fw-bold text-success" onclick="selectLocation(null, null)">
+                        <i class="bi bi-globe me-2"></i> Butun O'zbekiston
                     </div>
-                </form>
+                    <hr class="my-1">
+
+                    <div th:each="region : ${regions}"
+                         class="hudud-item region-selector-item d-flex justify-content-between align-items-center"
+                         th:data-id="${region.id}"
+                         th:data-name="${region.regionName}">
+                        <span th:text="${region.regionName}">Viloyat</span>
+                        <i class="bi bi-chevron-right text-muted" style="font-size: 0.8rem;"></i>
+                    </div>
+                </div>
             </div>
+
+            <span sec:authorize="isAuthenticated()" class="text-white small fw-bold px-2 py-1 bg-white bg-opacity-10 rounded">
+                <i class="bi bi-person-circle me-1"></i> <span th:text="${currentFullUsername} ?: 'Foydalanuvchi'"></span>
+            </span>
+
+            <a sec:authorize="isAuthenticated()" href="/profile/dashboard" class="btn btn-sm btn-light text-success fw-bold ms-2 px-3 py-2 rounded-3 border-0 shadow-sm">
+                <i class="bi bi-person-workspace me-1"></i> Kabinetim
+            </a>
+
+            <div sec:authorize="isAuthenticated()">
+                <a href="/fields/create" class="btn btn-sm btn-light text-success fw-bold px-3 py-2 rounded-3 border-0 shadow-sm">
+                    <i class="bi bi-plus-circle-fill me-1"></i> Maydon qo'shish
+                </a>
+            </div>
+
+            <a sec:authorize="!isAuthenticated()" href="/auth/login" class="btn btn-outline-light btn-sm px-3 py-2 rounded-3 fw-bold">Kirish</a>
+
+            <form sec:authorize="isAuthenticated()" th:action="@{/logout}" method="post" class="m-0">
+                <button type="submit" class="btn btn-danger btn-sm px-3 py-2 rounded-3 fw-bold">Chiqish</button>
+            </form>
         </div>
     </div>
-</div>
+</nav>
+
 <div class="container">
 
-    <h3 class="section-title animate__animated animate__fadeIn"><i class="bi bi-grid-3x3-gap-fill text-success me-2"></i>Mavjud barcha sport maydonlari</h3>
+    <div class="row mb-5 justify-content-center">
+        <div class="col-md-8">
+            <form th:action="@{/}" method="get" class="input-group search-box">
+                <input type="hidden" name="regionId" th:value="${selectedRegionId}">
+                <input type="hidden" name="districtId" th:value="${selectedDistrictId}">
+                <input type="text" name="search" th:value="${search}" class="form-control border-0 px-4 py-3" placeholder="Maydon qidirish yoki kalit so'z...">
+                <button type="submit" class="btn btn-success fw-bold px-4"><i class="bi bi-search me-1"></i> Qidirish</button>
+            </form>
+        </div>
+    </div>
 
-    <div class="row row-cols-1 row-cols-md-3 g-4 mb-5 animate__animated animate__fadeInUp">
+    <div class="row row-cols-1 row-cols-md-3 g-4 mb-5">
         <div th:each="field : ${fields}" th:if="${field != null}" class="col">
-            <div class="card h-100 card-custom border-0">
+            <div class="card h-100 card-custom shadow-sm">
 
-                <div class="position-relative overflow-hidden" style="border-radius: 16px 16px 0 0;">
+                <div class="position-relative">
                     <img th:if="${field.images != null and not #lists.isEmpty(field.images) and field.images[0] != null}"
                          th:src="${field.images[0].url}"
-                         class="card-img-top img-fluid"
-                         style="height: 240px; object-fit: cover; transition: transform 0.5s ease;"
-                         onmouseover="this.style.transform='scale(1.04)'"
-                         onmouseout="this.style.transform='scale(1)'"
+                         class="card-img-top"
+                         style="height: 220px; object-fit: cover;"
                          alt="Stadion rasmi">
 
                     <img th:if="${field.images == null or #lists.isEmpty(field.images) or field.images[0] == null}"
-                         src="https://via.placeholder.com/400x240?text=Rasm+Mavjud+Emas"
-                         class="card-img-top img-fluid"
-                         style="height: 240px; object-fit: cover;"
+                         src="https://via.placeholder.com/400x220?text=Rasm+Mavjud+Emas"
+                         class="card-img-top"
+                         style="height: 220px; object-fit: cover;"
                          alt="Rasm mavjud emas">
 
-                    <span class="badge badge-type-premium position-absolute top-0 start-0 m-3 shadow-sm px-3 py-2 rounded-3 small" th:text="${field.fieldType}">Tur</span>
+                    <span class="badge bg-success position-absolute top-0 start-0 m-3 shadow-sm px-3 py-2 rounded-2 small" th:text="${field.fieldType}">Tur</span>
 
-                    <span class="badge badge-rating-premium position-absolute top-0 end-0 m-3 px-2 py-2 rounded-3 d-flex align-items-center gap-1">
-                        <i class="bi bi-star-fill text-warning"></i>
-                        <span th:text="${field.avarageRating ?: '0.0'}">0.0</span>
-                        <span class="text-muted fw-normal" style="font-size: 0.75rem;" th:text="|(${field.ratingCount ?: 0})|">(0)</span>
-                    </span>
+                    <span class="badge bg-white text-dark position-absolute top-0 end-0 m-3 shadow-sm px-2 py-2 rounded-2 d-flex align-items-center gap-1fw-bold">
+        <i class="bi bi-star-fill text-warning"></i>
+        <span th:text="${field.avarageRating ?: '0.0'}">0.0</span>
+        <span class="text-muted fw-normal" style="font-size: 0.75rem;" th:text="|(${field.ratingCount ?: 0})|">(0)</span>
+    </span>
                 </div>
-
-                <div class="card-body d-flex flex-column p-4 bg-white" style="border-radius: 0 0 16px 16px;">
+                <div class="card-body d-flex flex-column p-4">
                     <h5 class="card-title fw-bold text-dark mb-2" th:text="${field.name}">Nomi</h5>
-                    <p class="text-muted small mb-4 d-flex align-items-center"><i class="bi bi-geo-alt-fill text-danger me-1 fs-6"></i> <span th:text="|${field.regionName}, ${field.districtName}|">Manzil</span></p>
+                    <p class="text-muted small mb-3"><i class="bi bi-geo-alt-fill text-danger me-1"></i> <span th:text="|${field.regionName}, ${field.districtName}|">Manzil</span></p>
 
                     <div class="mt-auto pt-3 border-top border-light">
                         <div class="d-flex justify-content-between align-items-center">
                             <div>
-                                <span class="text-muted small d-block fw-medium">Ijara narxi:</span>
-                                <span class="price-text" th:text="${#numbers.formatDecimal(field.priceHour, 0, 'WHITESPACE', 0, 'POINT')} + ' so\'m'"></span>
-                                <small class="text-secondary fw-medium">/soat</small>
+                                <span class="text-muted small d-block">Ijara narxi:</span>
+                                <span class="h5 text-success fw-bold m-0" th:text="${#numbers.formatDecimal(field.priceHour, 0, 'WHITESPACE', 0, 'POINT')} + ' so\'m'"></span>
+                                <small class="text-secondary">/soat</small>
                             </div>
-                            <a th:href="@{|/fields/${field.id}|}" class="btn btn-premium-action btn-register-custom btn-sm px-4">Batafsil <i class="bi bi-arrow-right-short fs-5 ms-1"></i></a>
+                            <a th:href="@{|/fields/${field.id}|}" class="btn btn-success fw-bold rounded-3 px-3 btn-sm">Batafsil <i class="bi bi-arrow-right small ms-1"></i></a>
                         </div>
                     </div>
                 </div>
 
             </div>
-        </div>
-
-        <div th:if="${#lists.isEmpty(fields)}" class="col-12 text-center py-5">
-            <i class="bi bi-search-heart fs-1 text-muted d-block mb-3"></i>
-            <h5 class="fw-bold text-secondary">Afsuski, qidiruv bo'yicha hech qanday maydon topilmadi.</h5>
-            <p class="text-muted small">Iltimos, boshqa kalit so'z yoki hududni tanlab ko'ring.</p>
         </div>
     </div>
 
     <div class="row mt-5" th:if="${totalPages > 1}">
         <div class="col-12 d-flex justify-content-center">
             <nav aria-label="Page navigation">
-                <ul class="pagination pagination-md shadow-sm rounded-3 overflow-hidden border-0">
+                <ul class="pagination pagination-md shadow-sm rounded-3 overflow-hidden">
                     <li class="page-item" th:classappend="${currentPage == 0} ? 'disabled'">
-                        <a class="page-link text-success bg-white border-0" th:href="@{/(page=${currentPage - 1}, search=${search}, regionId=${selectedRegionId}, districtId=${selectedDistrictId})}"><i class="bi bi-chevron-left"></i></a>
+                        <a class="page-link text-success border-light" th:href="@{/(page=${currentPage - 1}, search=${search}, regionId=${selectedRegionId}, districtId=${selectedDistrictId})}"><i class="bi bi-chevron-left"></i></a>
                     </li>
 
                     <li class="page-item" th:each="i : ${#numbers.sequence(0, totalPages - 1)}" th:classappend="${currentPage == i} ? 'active'">
-                        <a class="page-link border-0" th:classappend="${currentPage == i} ? 'bg-success text-white fw-bold' : 'text-success bg-white'"
+                        <a class="page-link border-light" th:classappend="${currentPage == i} ? 'bg-success border-success text-white' : 'text-success bg-white'"
                            th:href="@{/(page=${i}, search=${search}, regionId=${selectedRegionId}, districtId=${selectedDistrictId})}" th:text="${i + 1}">1</a>
                     </li>
 
                     <li class="page-item" th:classappend="${currentPage == totalPages - 1} ? 'disabled'">
-                        <a class="page-link text-success bg-white border-0" th:href="@{/(page=${currentPage + 1}, search=${search}, regionId=${selectedRegionId}, districtId=${selectedDistrictId})}"><i class="bi bi-chevron-right"></i></a>
+                        <a class="page-link text-success border-light" th:href="@{/(page=${currentPage + 1}, search=${search}, regionId=${selectedRegionId}, districtId=${selectedDistrictId})}"><i class="bi bi-chevron-right"></i></a>
                     </li>
                 </ul>
             </nav>
@@ -222,7 +201,7 @@
     </div>
 </div>
 
-<div th:replace="~{fragments :: footer_scripts}"></div>
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
 
 <script th:inline="javascript">
     const currentSearch = /*[[${search}]]*/ '';
@@ -244,18 +223,18 @@
             .then(res => res.json())
             .then(districts => {
                 let html = `
-                    <div class="hudud-header-btn mb-1 p-2" onclick="resetToRegions()">
+                    <div class="hudud-header-btn mb-1" onclick="resetToRegions()">
                         <i class="bi bi-arrow-left-short fs-5"></i> Orqaga
                     </div>
-                    <div class="hudud-item fw-bold text-success p-2" onclick="selectLocation(${regionId}, null)">
+                    <div class="hudud-item fw-bold text-success" onclick="selectLocation(${regionId}, null)">
                         <i class="bi bi-geo-alt me-2"></i> Butun ${regionName}
                     </div>
-                    <hr class="my-1 opacity-25">
+                    <hr class="my-1">
                 `;
 
                 districts.forEach(dist => {
                     html += `
-                        <div class="hudud-item p-2" onclick="selectLocation(${regionId}, ${dist.id})">
+                        <div class="hudud-item" onclick="selectLocation(${regionId}, ${dist.id})">
                             ${dist.districtName}
                         </div>
                     `;

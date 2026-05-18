@@ -1,204 +1,185 @@
+<!--
 <!DOCTYPE html>
 <html xmlns:th="http://www.thymeleaf.org" xmlns:sec="http://www.thymeleaf.org/extras/spring-security">
-<head th:fragment="header_links">
+<head th:fragment="head(title)">
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title th:text="${title} + ' - ManaPolya'">ManaPolya</title>
+
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    colors: {
+                        brand: {
+                            50: '#f0fdf4',
+                            100: '#dcfce7',
+                            200: '#bbf7d0',
+                            500: '#22c55e',
+                            600: '#16a34a',
+                            700: '#15803d',
+                            900: '#14532d',
+                        },
+                        dark: {
+                            800: '#1e293b',
+                            900: '#0f172a'
+                        }
+                    },
+                    fontFamily: {
+                        sans: ['Inter', 'sans-serif'],
+                    }
+                }
+            }
+        }
+    </script>
 
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+    <script defer src="https://cdn.jsdelivr.net/npm/alpinejs@3.x.x/dist/cdn.min.js"></script>
 
-    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
-    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.2/font/bootstrap-icons.min.css">
-
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/animate.css/4.1.1/animate.min.css"/>
+    <script src="https://unpkg.com/lucide@latest"></script>
 
     <style>
-        :root {
-            --primary-color: #00b4d8;       /* Zamonaviy Neon Havo Rang */
-            --primary-hover: #0096c7;
-            --accent-color: #10b981;        /* Premium Yalpiz Yashil (Sport maydonlari uchun ideal) */
-            --dark-gradient: linear-gradient(135deg, #0f172a 0%, #1e293b 100%); /* To'q ko'k/kulrang premium fon */
-            --card-shadow: 0 10px 30px rgba(15, 23, 42, 0.04);
-            --hover-shadow: 0 20px 40px rgba(15, 23, 42, 0.08);
-            --font-main: 'Inter', sans-serif;
-        }
-
-        body {
-            font-family: var(--font-main);
-            background-color: #f8fafc;
-            color: #334155;
-        }
-
-        /* Navbarni daxshatli chiroyli qilish */
-        .custom-navbar {
-            background: rgba(255, 255, 255, 0.85) !important;
-            backdrop-filter: blur(20px); /* Oyna effekti */
-            -webkit-backdrop-filter: blur(20px);
-            border-bottom: 1px solid rgba(241, 245, 249, 1);
-            transition: all 0.3s ease;
-        }
-
-        .navbar-brand-premium {
-            font-weight: 800;
-            font-size: 1.4rem;
-            letter-spacing: -0.5px;
-            background: linear-gradient(45deg, #10b981, #00b4d8);
-            -webkit-background-clip: text;
-            -webkit-text-fill-color: transparent;
-        }
-
-        .nav-link-premium {
-            font-weight: 500;
-            color: #475569 !important;
-            padding: 0.6rem 1.1rem !important;
-            border-radius: 8px;
-            transition: all 0.25s ease;
-            display: inline-flex;
-            align-items: center;
-        }
-
-        .nav-link-premium:hover {
-            color: var(--primary-hover) !important;
-            background-color: rgba(0, 180, 216, 0.06);
-            transform: translateY(-1px);
-        }
-
-        /* Active klassi uchun yorqin va toza yalpiz rang */
-        .nav-link-premium.active {
-            color: var(--accent-color) !important;
-            background-color: rgba(16, 185, 129, 0.08) !important;
-            font-weight: 700;
-        }
-
-        /* Profil va badjlar dizayni */
-        .user-badge {
-            background-color: #f1f5f9;
-            padding: 0.5rem 1rem;
-            border-radius: 50px;
-            font-weight: 600;
-            color: #1e293b;
-            display: inline-flex;
-            align-items: center;
-            gap: 8px;
-            border: 1px solid #e2e8f0;
-        }
-
-        .btn-premium-action {
-            font-weight: 600;
-            border-radius: 10px;
-            padding: 0.55rem 1.3rem;
-            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
-        }
-
-        .btn-login-custom {
-            background: transparent;
-            color: #475569;
-            border: 1px solid #cbd5e1;
-        }
-
-        .btn-login-custom:hover {
-            background: #f8fafc;
-            color: #1e293b;
-            border-color: #94a3b8;
-        }
-
-        .btn-register-custom {
-            background: linear-gradient(135deg, #10b981 0%, #059669 100%);
-            color: white;
-            border: none;
-            box-shadow: 0 4px 15px rgba(16, 185, 129, 0.2);
-        }
-
-        .btn-register-custom:hover {
-            transform: translateY(-2px);
-            box-shadow: 0 6px 20px rgba(16, 185, 129, 0.3);
-            color: white;
+        [x-cloak] { display: none !important; }
+        .glass-nav {
+            background: rgba(255, 255, 255, 0.85);
+            backdrop-filter: blur(14px);
+            border-bottom: 1px solid rgba(226, 232, 240, 0.8);
         }
     </style>
 </head>
-<body>
+<body class="bg-slate-50 text-slate-900 flex flex-col min-h-screen">
 
-<nav th:fragment="navbar" class="navbar navbar-expand-lg custom-navbar sticky-top py-3 animate__animated animate__fadeInDown">
-    <div class="container">
-        <a class="navbar-brand navbar-brand-premium d-flex align-items-center gap-2" th:href="@{/}">
-            <i class="bi bi-trophy-fill text-warning fs-3 animate__animated animate__bounceIn"></i>
-            <span class="fw-black">ManaPolya</span>
-        </a>
+<header th:fragment="header" class="glass-nav sticky top-0 z-50 w-full transition-all duration-300" x-data="{ mobileMenuOpen: false }">
+    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+        <div class="flex justify-between h-20 items-center">
 
-        <button class="navbar-toggler border-0 shadow-none" type="button" data-bs-toggle="collapse" data-bs-target="#mainNavbar">
-            <span class="navbar-toggler-icon"></span>
-        </button>
-
-        <div class="collapse navbar-collapse" id="mainNavbar">
-            <ul class="navbar-nav me-auto mb-2 mb-lg-0 ms-lg-4 gap-1">
-                <li class="nav-item">
-                    <a class="nav-link nav-link-premium" th:href="@{/}">
-                        <i class="bi bi-compass-fill me-1.5 text-success"></i> Maydonlar qidiruvi
-                    </a>
-                </li>
-
-                <li class="nav-item" sec:authorize="isAuthenticated()">
-                    <a class="nav-link nav-link-premium" th:href="@{/profile/dashboard}">
-                        <i class="bi bi-grid-1x2-fill me-1.5 text-primary"></i> Shaxsiy Kabinet
-                    </a>
-                </li>
-            </ul>
-
-            <div class="d-flex align-items-center gap-3">
-
-                <div sec:authorize="isAuthenticated()" class="d-flex align-items-center gap-2">
-                    <div class="user-badge shadow-sm animate__animated animate__fadeIn">
-                        <div class="bg-success rounded-circle d-flex align-items-center justify-content-center" style="width: 28px; height: 28px;">
-                            <i class="bi bi-person-fill text-white small"></i>
-                        </div>
-
-                        <span th:if="${currentFullUsername != null}" th:text="${currentFullUsername}"></span>
-                        <span th:if="${currentFullUsername == null}" sec:authentication="name"></span>
+            <div class="flex-shrink-0 flex items-center">
+                <a th:href="@{/}" class="flex items-center space-x-3 group">
+                    <div class="bg-brand-600 p-2.5 rounded-xl shadow-md shadow-green-600/20 group-hover:scale-105 transition-transform duration-200">
+                        <i data-lucide="layout-grid" class="w-6 h-6 text-white"></i>
                     </div>
+                    <span class="text-2xl font-black bg-gradient-to-r from-brand-600 to-emerald-700 bg-clip-text text-transparent tracking-tight">ManaPolya</span>
+                </a>
+            </div>
 
-                    <form th:action="@{/logout}" method="post" class="m-0">
-                        <button type="submit" class="btn btn-sm btn-outline-danger btn-premium-action border-0" title="Tizimdan chiqish">
-                            <i class="bi bi-box-arrow-right fs-5"></i>
+            <nav class="hidden md:flex space-x-8 font-semibold">
+                <a th:href="@{/}" class="text-slate-600 hover:text-brand-600 px-1 py-2 text-sm transition-colors flex items-center space-x-2">
+                    <i data-lucide="search" class="w-4 h-4"></i>
+                    <span>Maydon Qidirish</span>
+                </a>
+
+                <a sec:authorize="hasRole('OWNER')" th:href="@{/profile}" class="text-slate-600 hover:text-brand-600 px-1 py-2 text-sm transition-colors flex items-center space-x-2">
+                    <i data-lucide="plus-circle" class="w-4 h-4"></i>
+                    <span>Maydonlarim</span>
+                </a>
+            </nav>
+
+            <div class="hidden md:flex items-center space-x-4">
+                <div sec:authorize="isAnonymous()" class="flex items-center space-x-3">
+                    <a th:href="@{/auth/login}" class="text-slate-600 hover:text-brand-600 px-4 py-2 text-sm font-bold transition-colors">Kirish</a>
+                    <a th:href="@{/auth/signup}" class="bg-brand-600 hover:bg-brand-700 text-white px-5 py-2.5 rounded-xl text-sm font-bold shadow-sm shadow-green-600/10 hover:shadow-md hover:shadow-green-600/20 transition-all duration-200">Ro'yxatdan o'tish</a>
+                </div>
+
+                <div sec:authorize="isAuthenticated()" class="flex items-center space-x-4">
+                    <a th:href="@{/profile}" class="flex items-center space-x-3 bg-slate-100 hover:bg-slate-200/80 px-4 py-2 rounded-xl transition-all duration-200">
+                        <div class="w-8 h-8 rounded-full bg-brand-100 flex items-center justify-center border border-brand-200">
+                            <i data-lucide="user" class="w-4 h-4 text-brand-700"></i>
+                        </div>
+                        <div class="flex flex-col text-left">
+                            <span class="text-sm font-bold text-slate-800" th:text="${currentFullUsername}">Foydalanuvchi</span>
+                            <span class="text-[10px] uppercase font-black tracking-wider text-slate-400" sec:authentication="principal.authorities[0].authority.replace('ROLE_', '')">Role</span>
+                        </div>
+                    </a>
+
+                    <form th:action="@{/logout}" method="post" class="inline">
+                        <button type="submit" class="p-2.5 text-slate-400 hover:text-red-500 rounded-xl hover:bg-red-50 transition-colors" title="Chiqish">
+                            <i data-lucide="log-out" class="w-5 h-5"></i>
                         </button>
                     </form>
                 </div>
+            </div>
 
-                <div sec:authorize="isAnonymous()" class="d-flex align-items-center gap-2 animate__animated animate__fadeIn">
-                    <a th:href="@{/auth/login}" class="btn btn-premium-action btn-login-custom">
-                        <i class="bi bi-box-arrow-in-right me-1"></i> Kirish
-                    </a>
-                    <a th:href="@{/auth/signup}" class="btn btn-premium-action btn-register-custom">
-                        <i class="bi bi-person-plus-fill me-1"></i> Ro'yxatdan o'tish
-                    </a>
-                </div>
-
+            <div class="md:hidden flex items-center">
+                <button @click="mobileMenuOpen = !mobileMenuOpen" class="text-slate-600 hover:text-slate-900 p-2 rounded-xl hover:bg-slate-100 transition-colors focus:outline-none">
+                    <i data-lucide="menu" x-show="!mobileMenuOpen" class="w-6 h-6"></i>
+                    <i data-lucide="x" x-show="mobileMenuOpen" class="w-6 h-6" x-cloak></i>
+                </button>
             </div>
         </div>
     </div>
-</nav>
 
-<footer th:fragment="footer_scripts">
-    <div class="container text-center py-4 text-muted border-top mt-5" style="font-size: 0.9rem;">
-        <p class="m-0">&copy; 2026 <span class="fw-bold text-dark">ManaPolya</span>. Barcha huquqlar himoyalangan. Professional SaaS Portfolio Project.</p>
+    <div x-show="mobileMenuOpen" x-transition class="md:hidden border-t border-slate-200 bg-white px-4 pt-2 pb-6 space-y-3" x-cloak>
+        <a th:href="@{/}" class="block px-3 py-3 rounded-xl text-base font-semibold text-slate-700 hover:bg-slate-50 hover:text-brand-600">Maydon Qidirish</a>
+        <a sec:authorize="hasRole('OWNER')" th:href="@{/profile}" class="block px-3 py-3 rounded-xl text-base font-semibold text-slate-700 hover:bg-slate-50 hover:text-brand-600">Maydonlarim</a>
+
+        <div class="pt-4 border-t border-slate-100">
+            <div sec:authorize="isAnonymous()" class="space-y-2">
+                <a th:href="@{/auth/login}" class="block w-full text-center px-4 py-3 rounded-xl text-base font-bold text-slate-700 bg-slate-50 hover:bg-slate-100">Kirish</a>
+                <a th:href="@{/auth/signup}" class="block w-full text-center px-4 py-3 rounded-xl text-base font-bold text-white bg-brand-600 hover:bg-brand-700">Ro'yxatdan o'tish</a>
+            </div>
+            <div sec:authorize="isAuthenticated()" class="flex items-center justify-between bg-slate-50 p-3 rounded-xl">
+                <div class="flex items-center space-x-3">
+                    <div class="w-10 h-10 rounded-full bg-brand-100 flex items-center justify-center">
+                        <i data-lucide="user" class="w-5 h-5 text-brand-700"></i>
+                    </div>
+                    <div>
+                        <p class="text-sm font-bold text-slate-800" th:text="${currentFullUsername}">User</p>
+                        <a th:href="@{/profile}" class="text-xs text-brand-600 font-semibold">Shaxsiy kabinet</a>
+                    </div>
+                </div>
+                <form th:action="@{/logout}" method="post">
+                    <button type="submit" class="p-2 text-red-500 rounded-xl hover:bg-red-50 transition-colors">
+                        <i data-lucide="log-out" class="w-5 h-5"></i>
+                    </button>
+                </form>
+            </div>
+        </div>
     </div>
+</header>
 
-    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
-
+<footer th:fragment="footer" class="bg-dark-900 text-slate-400 py-12 mt-auto border-t border-slate-800">
+    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+        <div class="grid grid-cols-1 md:grid-cols-3 gap-8">
+            <div class="space-y-4">
+                <div class="flex items-center space-x-2">
+                    <div class="bg-brand-600 p-2 rounded-lg">
+                        <i data-lucide="layout-grid" class="w-5 h-5 text-white"></i>
+                    </div>
+                    <span class="text-xl font-bold text-white tracking-tight">ManaPolya</span>
+                </div>
+                <p class="text-sm text-slate-400 max-w-xs">Sport maydonchalarini real vaqt rejimida qidirish, qulay band qilish va stadionlarni boshqarish tizimi.</p>
+            </div>
+            <div>
+                <h3 class="text-white font-bold text-xs uppercase tracking-wider mb-4">Platforma</h3>
+                <ul class="space-y-2 text-sm">
+                    <li><a th:href="@{/}" class="hover:text-brand-500 transition-colors">Barcha maydonlar</a></li>
+                    <li><a th:href="@{/auth/login}" class="hover:text-brand-500 transition-colors">Tizimga kirish</a></li>
+                    <li><a th:href="@{/auth/signup}" class="hover:text-brand-500 transition-colors">Sherik/Ega sifatida ro'yxatdan o'tish</a></li>
+                </ul>
+            </div>
+            <div>
+                <h3 class="text-white font-bold text-xs uppercase tracking-wider mb-4">Texnik Yordam</h3>
+                <p class="text-sm text-slate-400 mb-2">Muammo yoki savollar tugʻilsa, aloqaga chiqing:</p>
+                <div class="flex items-center space-x-2 text-brand-500 font-bold">
+                    <i data-lucide="phone" class="w-4 h-4"></i>
+                    <span>+998 (90) 123-4567</span>
+                </div>
+            </div>
+        </div>
+        <div class="mt-12 pt-8 border-t border-slate-800 text-center text-xs text-slate-500">
+            &copy; 2026 ManaPolya. Final Exam & Portfolio Project. Barcha huquqlar himoyalangan.
+        </div>
+    </div>
     <script>
+        // Lucide ikonkalarni render qilish mantiqi
         document.addEventListener("DOMContentLoaded", function() {
-            const currentUrl = window.location.pathname;
-            const navLinks = document.querySelectorAll(".nav-link-premium");
-
-            navLinks.forEach(link => {
-                const hrefAttr = link.getAttribute("href");
-                if (hrefAttr === currentUrl) {
-                    link.classList.add("active");
-                }
-            });
+            lucide.createIcons();
         });
     </script>
 </footer>
 
 </body>
-</html>
+</html>-->

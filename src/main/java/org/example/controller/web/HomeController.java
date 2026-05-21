@@ -35,7 +35,7 @@ public class HomeController {
             @RequestParam(required = false)Long regionId,
             @RequestParam(required = false)Long districtId,
             @RequestParam(defaultValue = "0") int page,
-            @RequestParam(defaultValue = "9") int size,
+            @RequestParam(defaultValue = "6") int size,
             Model model,
             Principal principal){
 

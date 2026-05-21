@@ -1,9 +1,7 @@
 package org.example.service;
 
 import lombok.RequiredArgsConstructor;
-import lombok.Setter;
 import org.example.dto.DistrictDto;
-import org.example.entity.District;
 import org.example.repository.DistrictRepository;
 import org.example.repository.RegionRepository;
 import org.springframework.stereotype.Service;

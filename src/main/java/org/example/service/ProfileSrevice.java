@@ -22,7 +22,8 @@ public class ProfileSrevice {
                 new ResourceNotFoundException("Foydalanuvchi topilmadi"));
 
         ProfileDashboardDto.ProfileDashboardDtoBuilder builder = ProfileDashboardDto.builder()
-                .role(user.getRole());
+                .role(user.getRole())
+                .myOwnBookings(bookingService.getBookinsByCustomer(username));
 
         if (user.getRole() == UserRole.OWNER) {
             builder.isOwner(true)

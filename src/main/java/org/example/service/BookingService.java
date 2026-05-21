@@ -43,6 +43,10 @@ public class BookingService {
         User user = userRepository.findByUsername(username).orElseThrow(() ->
                 new ResourceNotFoundException("Foydalanuvchi " + username + " topilmadi"));
 
+        if(sportField.getOwner().getId().equals(user.getId())){
+            throw new BadRequestException("O'zingizni maydonni bronlay olmaysiz:");
+        }
+
         LocalDateTime startTime = dto.getStartTime().withSecond(0).withNano(0);
         LocalDateTime endTime = dto.getEndTime().withSecond(0).withNano(0);
 

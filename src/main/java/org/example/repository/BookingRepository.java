@@ -36,4 +36,20 @@ public interface BookingRepository extends JpaRepository<Booking, Long> {
     List<Booking> findByCustomerUsernameOrderByStartTimeDesc(String username);
 
     List<Booking> findByStatusAndEndTimeBefore(BookingStatus bookingStatus, LocalDateTime now);
+
+    @Query("""
+          select count(b) > 0 from Booking b 
+                    where b.customer.username = :username
+                              and b.status = 'CONFIRMED'
+                                        and (:start < b.endTime and :end > b.startTime)
+          """)
+    boolean existsOverlappingBookingForCustomer(
+            @Param("username") String username,
+            @Param("start") LocalDateTime start,
+            @Param("end") LocalDateTime end
+    );
+
+
+
+    boolean existsByCustomerUsernameAndStatusAndEndTimeAfter(String username, BookingStatus status, LocalDateTime time);
 }

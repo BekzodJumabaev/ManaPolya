@@ -43,10 +43,6 @@ public class BookingService {
         User user = userRepository.findByUsername(username).orElseThrow(() ->
                 new ResourceNotFoundException("Foydalanuvchi " + username + " topilmadi"));
 
-        if(sportField.getOwner().getId().equals(user.getId())){
-            throw new BadRequestException("O'zingizni maydonni bronlay olmaysiz:");
-        }
-
         LocalDateTime startTime = dto.getStartTime().withSecond(0).withNano(0);
         LocalDateTime endTime = dto.getEndTime().withSecond(0).withNano(0);
 
@@ -82,6 +78,15 @@ public class BookingService {
         if (bookingRepository.existsOverLappingBooking(dto.getFieldId(), startTime, endTime)) {
             throw new BadRequestException("Kechirasiz bu vaqt oralig'i band qilingan:");
         }
+
+        if (!sportField.getOwner().getUsername().equals(username)) {
+            boolean hasActiveBooking = bookingRepository.existsByCustomerUsernameAndStatusAndEndTimeAfter(
+                    username, BookingStatus.CONFIRMED, LocalDateTime.now());
+            if (hasActiveBooking) {
+                throw new BadRequestException("Xatolik: Sizda hozirda faol ijara mavjud! Avvalgi ijarangizni yakunlamasdan yoki uni bekor qilmasdan turib, yangi maydon bron qila olmaysiz.");
+            }
+        }
+
         long minutes = Duration.between(startTime, endTime).toMinutes();
         if (minutes < 60) throw new BadRequestException("Bron kamida 1 soat bo'lishi kerak: ");
 

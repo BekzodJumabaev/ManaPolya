@@ -3,6 +3,7 @@ package org.example.entity;
 import jakarta.persistence.*;
 import lombok.*;
 import lombok.experimental.SuperBuilder;
+import org.example.enums.FieldStatus;
 import org.example.enums.FieldType;
 import org.hibernate.annotations.SQLRestriction;
 import org.hibernate.annotations.Where;
@@ -52,5 +53,8 @@ public class SportField extends BaseEntity {
 
     @OneToMany(cascade = CascadeType.ALL, mappedBy = "field")
     private List<ImageField> images;
+
+    @Enumerated(EnumType.STRING)
+    private FieldStatus status = FieldStatus.PENDING;
 
 }

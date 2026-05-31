@@ -42,9 +42,22 @@ public class SportFieldWebController {
                             BindingResult bindingResult,
                             @RequestParam("images") List<MultipartFile> images,
                                                     Principal principal,
+                                                    RedirectAttributes redirectAttributes,
                                                     Model model){
 
         if (bindingResult.hasErrors()){
+            model.addAttribute("regions", regionRepository.findAll());
+            return "create-field";
+        }
+
+        if (images == null || images.isEmpty() || images.get(0).isEmpty()) {
+            model.addAttribute("error", "Xatolik: Maydon uchun kamida 1 ta rasm yuklash majburiy!");
+            model.addAttribute("regions", regionRepository.findAll());
+            return "create-field";
+        }
+
+        if (images.size() > 5) {
+            model.addAttribute("error", "Xatolik: Maksimal 5 ta rasm yuklashga ruxsat berilgan!");
             model.addAttribute("regions", regionRepository.findAll());
             return "create-field";
         }
@@ -53,10 +66,10 @@ public class SportFieldWebController {
             String currentUsername = principal.getName();
             SportFieldResponceDto responceDto = sportFieldService.create(currentUsername, dto);
 
-            if (images != null && !images.isEmpty() && !images.get(0).isEmpty()) {
                 imageService.uploadImages(responceDto.getId(),images);
-            }
-            return "redirect:/?message=Maydon muvaffaqiyatli qo'shildi:";
+
+            redirectAttributes.addFlashAttribute("message", "Arizangiz muvaffaqiyatli yuborildi. Administrator tekshiruvidan so'ng stadioningiz qo'shiladi!");
+            return "redirect:/profile/dashboard";
         }catch (Exception e){
             model.addAttribute("error",e.getMessage());
             model.addAttribute("regions", regionRepository.findAll());

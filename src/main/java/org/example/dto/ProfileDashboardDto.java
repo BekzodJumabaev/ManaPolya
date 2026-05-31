@@ -16,7 +16,7 @@ public class ProfileDashboardDto {
     private boolean isOwner;
 
     private List<SportFieldResponceDto> myFields;
+    private List<SportFieldResponceDto> myActiveFields;
     private List<BookingResponceDto> myCustomerBookings;
-
     private List<BookingResponceDto> myOwnBookings;
 }

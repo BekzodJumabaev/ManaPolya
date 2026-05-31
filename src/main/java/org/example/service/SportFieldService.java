@@ -6,13 +6,16 @@ import org.example.dto.SportFieldResponceDto;
 import org.example.dto.SportFieldUpdateDto;
 import org.example.dto.SportFileldSearchDto;
 import org.example.entity.District;
+import org.example.entity.FieldRating;
 import org.example.entity.SportField;
 import org.example.entity.User;
+import org.example.enums.FieldStatus;
 import org.example.enums.UserRole;
 import org.example.exceptions.BadRequestException;
 import org.example.exceptions.ResourceNotFoundException;
 import org.example.mapper.SportFieldMapper;
 import org.example.repository.DistrictRepository;
+import org.example.repository.FieldRatingRepository;
 import org.example.repository.SportFieldRepository;
 import org.example.repository.UserRepository;
 import org.example.repository.specification.SportFieldSpecification;
@@ -26,6 +29,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
+import java.util.Optional;
 
 @Service
 @RequiredArgsConstructor
@@ -35,8 +39,10 @@ public class SportFieldService {
     private final SportFieldRepository sportFieldRepository;
     private final DistrictRepository districtRepository;
     private final SportFieldMapper mapper;
+    private final BookingService bookingService;
+    private final FieldRatingRepository fieldRatingRepository;
 
-    public SportFieldResponceDto create(String currentUsername, SportFieldCreateDto dto){
+    public SportFieldResponceDto create(String currentUsername, SportFieldCreateDto dto) {
 
         District district = districtRepository.findById(dto.getDistrictId()).orElseThrow(() ->
                 new ResourceNotFoundException("Tuman topilmadi: " + dto.getDistrictId()));
@@ -54,6 +60,8 @@ public class SportFieldService {
         sportField.setOwner(owner);
         sportField.setAvarageRating(0.0);
         sportField.setRatingCount(0);
+        sportField.setStatus(FieldStatus.PENDING);
+
 
         SportField save = sportFieldRepository.save(sportField);
 
@@ -73,6 +81,10 @@ public class SportFieldService {
         }
 
         Specification<SportField> search = SportFieldSpecification.buildSpecification(searchDto);
+
+        Specification<SportField> onlyApproved = (root, query, cb) ->
+                cb.equal(root.get("status"), FieldStatus.APPROVED);
+
         Page<SportField> fieldPage = sportFieldRepository.findAll(search, pageable);
 
         List<SportFieldResponceDto> dtoList = mapper.toDtoList(fieldPage.getContent());
@@ -90,6 +102,10 @@ public class SportFieldService {
     public SportFieldResponceDto getById(long id) {
         SportField sportField = sportFieldRepository.findById(id).orElseThrow(() ->
                 new ResourceNotFoundException("Maydon topilmadi: " + id));
+
+        if (sportField.getStatus() != FieldStatus.APPROVED) {
+            throw new ResourceNotFoundException("Ushbu sport maydoni ayni vaqtda faol emas!");
+        }
 
         SportFieldResponceDto responceDto = mapper.toDto(sportField);
         responceDto.setDistrictName(sportField.getDistrict().getDistrictName());
@@ -112,7 +128,7 @@ public class SportFieldService {
             dto.setAvarageRating(entity.getAvarageRating() != null ? entity.getAvarageRating() : 0.0);
             dto.setRatingCount(entity.getRatingCount() != null ? entity.getRatingCount() : 0);
         }
-        return mapper.toDtoList(byOwnerUsername);
+        return dtoList;
     }
 
 
@@ -153,12 +169,14 @@ public class SportFieldService {
         if (!sportField.getOwner().getUsername().equals(username)) {
             throw new org.example.exceptions.BadRequestException("Siz bu maydonni o'chira olmaysiz: ");
         }
-        sportField.setDeleted(true);
+        sportField.setStatus(FieldStatus.REJECTED);
         sportFieldRepository.save(sportField);
+
+        bookingService.cancelFutureBookingsForField(id);
     }
 
     @Transactional
-    public void addRating(Long fieldId, Integer stars) {
+    public void addRating(Long fieldId, Integer stars, String username) {
 
         if (stars < 1 || stars > 5) {
             throw new BadRequestException("Xatolik: Reyting balli 1 va 5 oralig'ida bo'lishi shart ");
@@ -167,21 +185,76 @@ public class SportFieldService {
         SportField sportField = sportFieldRepository.findById(fieldId).orElseThrow(() ->
                 new ResourceNotFoundException("Maydon topilmadi: " + fieldId));
 
+        User user = userRepository.findByUsername(username).orElseThrow(() ->
+                new ResourceNotFoundException("Foydalanuvchi topilmadi: " + username));
+
+        Optional<FieldRating> existingRatingOpt =
+                fieldRatingRepository.findByUserIdAndSportFieldId(user.getId(), fieldId);
+
         double currentAvg = sportField.getAvarageRating() != null ? sportField.getAvarageRating() : 0.0;
         int currentCount = sportField.getRatingCount() != null ? sportField.getRatingCount() : 0;
 
-        if (currentCount == 0){
-            sportField.setAvarageRating(stars.doubleValue());
-            sportField.setRatingCount(1);
-        }else {
-            double newTotalScore = (currentAvg * currentCount) + stars;
-            int newCount = currentCount + 1;
-            double newAvg = newTotalScore / newCount;
+        if (existingRatingOpt.isPresent()) {
+            FieldRating oldRating = existingRatingOpt.get();
+            int oldStars = oldRating.getStars();
 
+            double newAvg = ((currentAvg * currentCount) - oldStars + stars) / currentCount;
             sportField.setAvarageRating(Math.round(newAvg * 10.0) / 10.0);
-            sportField.setRatingCount(newCount);
+
+            oldRating.setStars(stars);
+            fieldRatingRepository.save(oldRating);
+        } else {
+            if (currentCount == 0) {
+                sportField.setAvarageRating(stars.doubleValue());
+                sportField.setRatingCount(1);
+            } else {
+                double newTotalScore = (currentAvg * currentCount) + stars;
+                int newCount = currentCount + 1;
+                double newAvg = newTotalScore / newCount;
+
+                sportField.setAvarageRating(Math.round(newAvg * 10.0) / 10.0);
+                sportField.setRatingCount(newCount);
+            }
+            FieldRating newRating = FieldRating.builder()
+                    .userId(user.getId())
+                    .sportFieldId(fieldId)
+                    .stars(stars)
+                    .build();
+            fieldRatingRepository.save(newRating);
+        }
+        sportFieldRepository.save(sportField);
+    }
+
+    public List<SportFieldResponceDto> getPendingFields() {
+        List<SportField> pendingFields = sportFieldRepository.findByStatus(FieldStatus.PENDING);
+        return mapper.toDtoList(pendingFields);
+    }
+
+    @Transactional
+    public void moderateField(Long fieldId, FieldStatus newStatus, String adminUsername) {
+
+        System.out.println("Admin " + adminUsername + " maydonni moderatsiya qilyapti: ID " + fieldId);
+
+        SportField sportField = sportFieldRepository.findById(fieldId).orElseThrow(() ->
+                new ResourceNotFoundException("Maydon topilmadi: " + fieldId));
+
+        if (sportField.getStatus() == newStatus) {
+            throw new BadRequestException("Maydon allaqachon bu holatda turibdi!");
         }
 
+        sportField.setStatus(newStatus);
         sportFieldRepository.save(sportField);
+    }
+
+
+    @Transactional
+    public void deleteAsAdmin(Long fieldId) {
+        SportField sportField = sportFieldRepository.findById(fieldId).orElseThrow(() ->
+                new ResourceNotFoundException("Maydon topilmadi: " + fieldId));
+
+        sportField.setStatus(FieldStatus.REJECTED);
+        sportFieldRepository.save(sportField);
+
+        bookingService.cancelFutureBookingsForField(fieldId);
     }
 }

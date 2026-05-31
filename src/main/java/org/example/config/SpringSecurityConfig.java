@@ -67,11 +67,13 @@ public class SpringSecurityConfig {
     @Order(2)
     public SecurityFilterChain webSecurityFilterChain(HttpSecurity http) throws Exception {
         http
-                .csrf(AbstractHttpConfigurer::disable)
+                /*.csrf(AbstractHttpConfigurer::disable)*/
                 .authorizeHttpRequests(auth -> auth
-                        .requestMatchers("/auth/login", "/auth/signup", "/auth/districts", "/").permitAll()
+                        .requestMatchers("/auth/login", "/auth/signup", "/auth/districts", "/", "/error", "/auth/reset-password").permitAll()
                         .requestMatchers("/css/**", "/js/**", "/images/**", "/uploads/**").permitAll()
                         .requestMatchers(HttpMethod.GET, "/fields/{id}").permitAll()
+
+                        .requestMatchers("/admin/**").hasRole("ADMIN")
 
                         .requestMatchers("/fields/create").authenticated()
                         .requestMatchers("/fields/*/book").authenticated()
@@ -84,12 +86,26 @@ public class SpringSecurityConfig {
                 .formLogin(form -> form
                         .loginPage("/auth/login")
                         .loginProcessingUrl("/auth/login")
-                        .defaultSuccessUrl("/",  false)
+                        .successHandler((request, response, authentication) -> {
+                            boolean isAdmin = authentication.getAuthorities().stream()
+                                    .anyMatch(a -> a.getAuthority().equals("ROLE_ADMIN"));
+                            String redirectUrl = request.getParameter("redirect");
+
+                            if (isAdmin) {
+                                response.sendRedirect("/admin/dashboard");
+                            } else if (redirectUrl!=null && !redirectUrl.trim().isEmpty()) {
+                                response.sendRedirect(redirectUrl);
+                            } else {
+                                response.sendRedirect("/");
+                            }
+                        })
                         .permitAll()
                 )
                 .logout(logout -> logout
                         .logoutUrl("/logout")
                         .logoutSuccessUrl("/auth/login?logout")
+                        .invalidateHttpSession(true)
+                        .deleteCookies("JSESSIONID")
                         .permitAll());
         return http.build();
     }

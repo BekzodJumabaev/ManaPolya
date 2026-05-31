@@ -1,188 +1,213 @@
 <!DOCTYPE html>
 <html xmlns:th="http://www.thymeleaf.org" xmlns:sec="http://www.thymeleaf.org/extras/spring-security">
 <head>
-    <meta charset="UTF-8">
-    <title th:text="|${field.name} - Batafsil|">Details</title>
-    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
-    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.1/font/bootstrap-icons.css">
+    <th:block th:replace="~{fragments :: header-assets}"></th:block>
+    <title th:text="|${field.name} - Batafsil|">Batafsil</title>
+
     <style>
-        .details-img { height: 380px; object-fit: cover; border-radius: 12px; }
-        .slot-badge { font-size: 0.85rem; padding: 6px 12px; border-radius: 6px; }
-        .card-sticky { position: sticky; top: 20px; }
+        .details-img { height: 450px; object-fit: cover; border-radius: 16px; }
+        .slot-badge { font-size: 0.85rem; padding: 8px 14px; border-radius: 8px; }
+        .card-sticky { position: sticky; top: 20px; z-index: 10; }
+        .bg-sport-light { background-color: #e8f5e9; }
+        .feature-box {
+            background: #fff;
+            border: 1px solid #e9ecef;
+            border-radius: 12px;
+            padding: 15px;
+            text-align: center;
+            transition: 0.3s;
+        }
+        .feature-box:hover { box-shadow: 0 5px 15px rgba(0,0,0,0.05); transform: translateY(-3px); }
+        .breadcrumb-custom { background-color: #ffffff; padding: 12px 20px; border-radius: 12px; box-shadow: 0 2px 10px rgba(0,0,0,0.03); }
+        .star-link { cursor: pointer; transition: transform 0.15s ease; text-decoration: none !important; }
+        .star-link:hover { transform: scale(1.2); }
     </style>
 </head>
-<body class="bg-light">
+<body>
 
-<nav class="navbar navbar-dark bg-success shadow-sm mb-4">
-    <div class="container">
-        <a class="navbar-brand fw-bold" href="/"><i class="bi bi-arrow-left me-2"></i>Bosh sahifaga qaytish</a>
+<div th:replace="~{fragments :: navbar}"></div>
+
+<div class="container mt-4 mb-3">
+    <div class="breadcrumb-custom d-flex align-items-center">
+        <a href="/" class="text-decoration-none text-success fw-bold me-3">
+            <i class="bi bi-arrow-left-circle-fill me-1"></i> Barcha maydonlar
+        </a>
+        <span class="text-muted mx-2">|</span>
+        <span class="text-muted fw-medium" th:text="${field.name}">Maydon nomi</span>
     </div>
-</nav>
+</div>
 
 <div class="container pb-5">
-
-    <div th:if="${message}" class="alert alert-success alert-dismissible fade show rounded-3 shadow-sm" role="alert">
-        <i class="bi bi-check-circle-fill me-2"></i> <span th:text="${message}"></span>
+    <div th:if="${message}" class="alert alert-success alert-dismissible fade show rounded-3 shadow-sm border-0" role="alert">
+        <i class="bi bi-check-circle-fill me-2 fs-5"></i> <span th:text="${message}"></span>
         <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
     </div>
-    <div th:if="${error}" class="alert alert-danger alert-dismissible fade show rounded-3 shadow-sm" role="alert">
-        <i class="bi bi-exclamation-triangle-fill me-2"></i> <span th:text="${error}"></span>
+    <div th:if="${error}" class="alert alert-danger alert-dismissible fade show rounded-3 shadow-sm border-0" role="alert">
+        <i class="bi bi-exclamation-triangle-fill me-2 fs-5"></i> <span th:text="${error}"></span>
         <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
     </div>
 
     <div class="row g-4">
-        <div class="col-lg-7">
-            <div th:if="${not #lists.isEmpty(field.images)}" id="fieldCarousel" class="carousel slide shadow-sm mb-4 rounded-3 overflow-hidden" data-bs-ride="carousel">
-                <div class="carousel-indicators" th:if="${#lists.size(field.images) > 1}">
-                    <button th:each="img, iter : ${field.images}"
-                            type="button"
-                            data-bs-target="#fieldCarousel"
-                            th:data-bs-slide-to="${iter.index}"
-                            th:classappend="${iter.first} ? 'active'"
-                            aria-current="true">
-                    </button>
-                </div>
+        <div class="col-lg-8">
 
+            <div th:if="${not #lists.isEmpty(field.images)}" id="fieldCarousel" class="carousel slide shadow-sm mb-4 rounded-4 overflow-hidden" data-bs-ride="carousel">
+                <div class="carousel-indicators" th:if="${#lists.size(field.images) > 1}">
+                    <button th:each="img, iter : ${field.images}" type="button" data-bs-target="#fieldCarousel" th:data-bs-slide-to="${iter.index}" th:classappend="${iter.first} ? 'active'" aria-current="true"></button>
+                </div>
                 <div class="carousel-inner">
                     <div th:each="img, iter : ${field.images}" class="carousel-item" th:classappend="${iter.first} ? 'active'">
                         <img th:src="${img.url}" class="d-block w-100 details-img" alt="Stadion rasmi">
                     </div>
                 </div>
-
                 <button th:if="${#lists.size(field.images) > 1}" class="carousel-control-prev" type="button" data-bs-target="#fieldCarousel" data-bs-slide="prev">
                     <span class="carousel-control-prev-icon" aria-hidden="true"></span>
-                    <span class="visually-hidden">Oldingi</span>
                 </button>
                 <button th:if="${#lists.size(field.images) > 1}" class="carousel-control-next" type="button" data-bs-target="#fieldCarousel" data-bs-slide="next">
                     <span class="carousel-control-next-icon" aria-hidden="true"></span>
-                    <span class="visually-hidden">Keyingi</span>
                 </button>
             </div>
 
-            <img th:if="${#lists.isEmpty(field.images)}" src="https://via.placeholder.com/800x450?text=Rasm+Mavjud+Emas" class="w-100 details-img shadow-sm mb-4">
+            <img th:if="${#lists.isEmpty(field.images)}" src="https://images.unsplash.com/photo-1459865264687-595d652de67e?ixlib=rb-4.0.3&auto=format&fit=crop&w=1000&q=80" class="w-100 details-img shadow-sm mb-4 rounded-4" alt="Stadion">
 
-            <div class="card border-0 shadow-sm p-4 rounded-3 mb-4">
-                <div class="d-flex justify-content-between align-items-start mb-2">
-                    <h2 class="fw-bold text-dark m-0" th:text="${field.name}">Nomi</h2>
-                    <span class="badge bg-success bg-opacity-10 text-success p-2 rounded-2 fw-bold" th:text="${field.fieldType}">Tur</span>
-                </div>
-
-                <p class="text-muted small mb-3">
-                    <i class="bi bi-geo-alt-fill text-danger me-1"></i>
-                    <span th:text="|${field.regionName}, ${field.districtName}, ${field.address}|">Manzil</span>
-                </p>
-                <hr class="text-muted my-3">
-
-                <h5 class="fw-bold text-secondary mb-2">Tavsif</h5>
-                <p class="text-secondary lh-lg"
-                   th:text="${field.description ?: 'Ushbu sport maydoni haqida qo''shimcha ma''lumotlar kiritilmagan.'}">
-                    Tavsif...
-                </p>
-                <hr class="text-muted my-3">
-
-                <h5 class="fw-bold text-secondary mb-3"><i class="bi bi-telephone-outbound text-success me-1"></i> Maydon egasi bilan bog'lanish</h5>
-                <div class="p-3 bg-light rounded-3 d-flex align-items-center justify-content-between border">
-                    <div>
-                        <span class="small text-muted d-block">Aloqa uchun telefon:</span>
-                        <span class="fw-bold text-dark fs-5" th:text="${field.ownerPhone} ?: '+998 (90) 123-45-67'"></span>
+            <div class="card border-0 shadow-sm rounded-4 mb-4 overflow-hidden">
+                <div class="card-body p-4 p-md-5">
+                    <div class="d-flex flex-wrap justify-content-between align-items-center mb-3">
+                        <h1 class="fw-bold text-dark m-0" th:text="${field.name}">Maydon Nomi</h1>
+                        <span class="badge bg-sport-light text-success px-3 py-2 fs-6 rounded-pill border border-success" th:text="${field.fieldType}">Tur</span>
                     </div>
-                    <a th:href="|tel:${field.ownerPhone ?: '+998901234567'}|" class="btn btn-success fw-bold rounded-2">
-                        <i class="bi bi-telephone-fill me-1"></i> Qo'ng'iroq qilish
-                    </a>
-                </div>
 
-                <hr class="text-muted my-3">
-                <h5 class="fw-bold text-secondary mb-3"><i class="bi bi-map-fill text-primary me-1"></i> Geolokatsiya (Xarita)</h5>
-                <div class="card border rounded-3 overflow-hidden shadow-sm">
-                    <iframe th:with="lat=${field.latitude ?: 41.311081}, lng=${field.longitude ?: 69.240562}"
-                            th:src="|https://yandex.ru/map-widget/v1/?ll=${lng}%2C${lat}&z=16&pt=${lng}%2C${lat}%2Cpm2grm|"
-                            width="100%"
-                            height="250"
-                            frameborder="0"
-                            allowfullscreen="true"
-                            style="position:relative; border:0;">
-                    </iframe>
-                </div>
+                    <p class="text-muted fs-5 mb-4 border-bottom pb-3">
+                        <i class="bi bi-geo-alt-fill text-success me-2"></i>
+                        <span th:text="|${field.regionName}, ${field.districtName}, ${field.address}|">Manzil</span>
+                    </p>
 
-                <h5 class="fw-bold text-secondary mb-3">Qulayliklar</h5>
-                <div class="d-flex gap-3">
-                    <span class="slot-badge bg-light border text-dark fw-medium">
-                        <i class="bi bi-brightness-high-fill text-warning me-1"></i>
-                        Tungi yoritgich: <span th:text="${field.hasLight ? 'Bor' : 'Yo''q'}"></span>
-                    </span>
-                    <span class="slot-badge bg-light border text-dark fw-medium">
-                        <i class="bi bi-droplet-fill text-primary me-1"></i>
-                        Dush xonasi: <span th:text="${field.hasShower ? 'Bor' : 'Yo''q'}"></span>
-                    </span>
+                    <div class="row g-3 mb-4">
+                        <div class="col-6 col-md-3">
+                            <div class="feature-box bg-light border-0">
+                                <i class="bi bi-brightness-high-fill text-warning fs-3 mb-2 d-block"></i>
+                                <span class="fw-bold text-dark d-block">Yoritgich</span>
+                                <small th:text="${field.hasLight ? 'Mavjud' : 'Yo''q'}" class="text-muted"></small>
+                            </div>
+                        </div>
+                        <div class="col-6 col-md-3">
+                            <div class="feature-box bg-light border-0">
+                                <i class="bi bi-droplet-fill text-info fs-3 mb-2 d-block"></i>
+                                <span class="fw-bold text-dark d-block">Dush xonasi</span>
+                                <small th:text="${field.hasShower ? 'Mavjud' : 'Yo''q'}" class="text-muted"></small>
+                            </div>
+                        </div>
+                        <div class="col-12 col-md-6">
+                            <div class="feature-box bg-success bg-opacity-10 border-0 h-100 d-flex flex-column justify-content-center">
+                                <span class="text-success small fw-bold mb-1">Aloqa uchun:</span>
+                                <span class="fw-bold text-success fs-5 d-block mb-1" th:text="${field.ownerPhone} ?: '+998 (--) --- -- --'"></span>
+                                <a th:href="|tel:${field.ownerPhone}|" class="btn btn-sm btn-success rounded-pill fw-bold w-75 mx-auto mt-2">Qo'ng'iroq qilish</a>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="card border-0 shadow-sm rounded-4 mb-4">
+                <div class="card-header bg-white border-0 pt-4 pb-0 px-4 px-md-5">
+                    <h4 class="fw-bold text-dark mb-0"><i class="bi bi-info-square-fill text-success me-2"></i>Maydon haqida</h4>
+                </div>
+                <div class="card-body p-4 p-md-5 pt-3">
+                    <p class="text-secondary lh-lg fs-6 bg-light p-4 rounded-4 m-0 border" th:text="${field.description ?: 'Ushbu sport maydoni haqida qo''shimcha ma''lumotlar kiritilmagan.'}">
+                        Tavsif...
+                    </p>
+                </div>
+            </div>
+
+            <div class="card border-0 shadow-sm rounded-4 mb-4">
+                <div class="card-header bg-white border-0 pt-4 pb-0 px-4 px-md-5">
+                    <h4 class="fw-bold text-dark mb-0"><i class="bi bi-map-fill text-success me-2"></i>Xaritadagi joylashuv</h4>
+                </div>
+                <div class="card-body p-4 p-md-5 pt-3">
+                    <div class="rounded-4 overflow-hidden shadow-sm border p-1 bg-light">
+                        <iframe class="rounded-3" th:with="lat=${field.latitude ?: 41.311081}, lng=${field.longitude ?: 69.240562}"
+                                th:src="|https://yandex.ru/map-widget/v1/?ll=${lng}%2C${lat}&z=16&pt=${lng}%2C${lat}%2Cpm2grm|"
+                                width="100%" height="350" frameborder="0" allowfullscreen="true">
+                        </iframe>
+                    </div>
                 </div>
             </div>
         </div>
 
-        <div class="col-lg-5">
-
-            <div class="mb-4 p-3 bg-light rounded-3 text-center border">
-                <div class="d-flex align-items-center justify-content-center gap-2 mb-1">
-                    <h4 class="fw-bold text-dark m-0" th:text="${field.avarageRating ?: '0.0'}">0.0</h4>
-
-                    <div class="d-flex gap-1 text-warning fs-5">
+        <div class="col-lg-4">
+            <div class="card border-0 shadow-sm p-4 rounded-4 mb-4 text-center">
+                <div class="d-flex align-items-center justify-content-center gap-3 mb-2">
+                    <h2 class="fw-bold text-dark m-0" th:text="${field.avarageRating ?: '0.0'}">0.0</h2>
+                    <div class="text-warning fs-4">
                         <i th:each="i : ${#numbers.sequence(1, 5)}"
                            th:class="${field.avarageRating != null ? (field.avarageRating >= i ? 'bi bi-star-fill' : 'bi bi-star') : 'bi bi-star'}"></i>
                     </div>
-
-                    <small class="text-muted" th:text="|(${field.ratingCount ?: 0} ta ovoz)|">(0 ta ovoz)</small>
                 </div>
+                <p class="text-muted small mb-3" th:text="|Asoslangan: ${field.ratingCount ?: 0} ta ovoz|"></p>
 
-                <hr class="my-2 text-muted opacity-25">
+                <span class="small text-dark fw-bold d-block mb-2">Maydonga baho bering:</span>
 
-                <span class="small text-muted d-block mb-2 fw-medium">Maydonga baho bering:</span>
-
-                <form th:action="@{|/fields/${field.id}/rate|}" method="post" class="d-flex justify-content-center gap-2">
-                    <button type="submit" name="stars" value="1" class="btn btn-sm btn-outline-warning border-0 p-1" title="Yomon"><i class="bi bi-star fs-4"></i></button>
-                    <button type="submit" name="stars" value="2" class="btn btn-sm btn-outline-warning border-0 p-1" title="Qoniqarli"><i class="bi bi-star fs-4"></i></button>
-                    <button type="submit" name="stars" value="3" class="btn btn-sm btn-outline-warning border-0 p-1" title="Yaxshi"><i class="bi bi-star fs-4"></i></button>
-                    <button type="submit" name="stars" value="4" class="btn btn-sm btn-outline-warning border-0 p-1" title="Juda yaxshi"><i class="bi bi-star fs-4"></i></button>
-                    <button type="submit" name="stars" value="5" class="btn btn-sm btn-outline-warning border-0 p-1" title="A'lo"><i class="bi bi-star fs-4"></i></button>
+                <form sec:authorize="isAuthenticated()" th:action="@{|/fields/${field.id}/rate|}" method="post" id="ratingForm" class="d-flex justify-content-center gap-2">
+                    <input type="hidden" name="stars" id="selectedStars" value="">
+                    <a href="javascript:void(0)" onclick="submitRating(1)" class="text-warning star-link"><i class="bi bi-star-fill fs-4"></i></a>
+                    <a href="javascript:void(0)" onclick="submitRating(2)" class="text-warning star-link"><i class="bi bi-star-fill fs-4"></i></a>
+                    <a href="javascript:void(0)" onclick="submitRating(3)" class="text-warning star-link"><i class="bi bi-star-fill fs-4"></i></a>
+                    <a href="javascript:void(0)" onclick="submitRating(4)" class="text-warning star-link"><i class="bi bi-star-fill fs-4"></i></a>
+                    <a href="javascript:void(0)" onclick="submitRating(5)" class="text-warning star-link"><i class="bi bi-star-fill fs-4"></i></a>
                 </form>
+
+                <div sec:authorize="isAnonymous()" class="d-flex justify-content-center gap-2">
+                    <a th:href="@{/auth/login(redirect=${'/fields/' + field.id})}" class="text-warning star-link"><i class="bi bi-star-fill fs-4"></i></a>
+                    <a th:href="@{/auth/login(redirect=${'/fields/' + field.id})}" class="text-warning star-link"><i class="bi bi-star-fill fs-4"></i></a>
+                    <a th:href="@{/auth/login(redirect=${'/fields/' + field.id})}" class="text-warning star-link"><i class="bi bi-star-fill fs-4"></i></a>
+                    <a th:href="@{/auth/login(redirect=${'/fields/' + field.id})}" class="text-warning star-link"><i class="bi bi-star-fill fs-4"></i></a>
+                    <a th:href="@{/auth/login(redirect=${'/fields/' + field.id})}" class="text-warning star-link"><i class="bi bi-star-fill fs-4"></i></a>
+                </div>
             </div>
 
-            <div class="card border-0 shadow-sm p-4 rounded-3 card-sticky bg-white">
-                <h4 class="fw-bold text-success mb-2 text-center"><i class="bi bi-calendar-check me-2"></i>Hozir band qiling</h4>
-                <p class="text-muted small text-center mb-3">Maydon ish vaqti: <span class="fw-bold text-dark" th:text="|${field.openTime} - ${field.closeTime}|"></span></p>
-                <h3 class="text-center fw-extrabold text-success mb-4" th:text="|${field.priceHour} so'm/soat|"></h3>
+            <div class="card border-0 shadow-lg p-4 rounded-4 card-sticky">
+                <h4 class="fw-bold text-success mb-1 text-center">Hozir band qiling</h4>
+                <p class="text-muted small text-center mb-3">Ish vaqti: <span class="fw-bold text-dark" th:text="|${field.openTime} - ${field.closeTime}|"></span></p>
+
+                <div class="bg-sport-light p-3 rounded-3 text-center mb-4">
+                    <h3 class="fw-bold text-success m-0" th:text="|${#numbers.formatDecimal(field.priceHour, 0, 'COMMA', 0, 'POINT')} so'm|"></h3>
+                    <span class="text-muted small">1 soat uchun</span>
+                </div>
 
                 <form th:action="@{|/fields/${field.id}/book|}" method="post" id="bookingForm">
                     <div class="mb-3">
-                        <label class="form-label small fw-bold text-muted">Boshlanish vaqti</label>
-                        <input type="datetime-local" name="startTime" id="startTime" class="form-control bg-light border-0 py-2 rounded-2" required>
+                        <label class="form-label small fw-bold text-dark">Boshlanish vaqti</label>
+                        <input type="datetime-local" name="startTime" id="startTime" class="form-control form-control-lg bg-light border-0 rounded-3" required>
                     </div>
                     <div class="mb-4">
-                        <label class="form-label small fw-bold text-muted">Tugash vaqti</label>
-                        <input type="datetime-local" name="endTime" id="endTime" class="form-control bg-light border-0 py-2 rounded-2" required>
+                        <label class="form-label small fw-bold text-dark">Tugash vaqti</label>
+                        <input type="datetime-local" name="endTime" id="endTime" class="form-control form-control-lg bg-light border-0 rounded-3" required>
                     </div>
 
-                    <button type="submit" class="btn btn-success btn-lg w-100 fw-bold rounded-3 shadow-sm mb-4"><i class="bi bi-lightning-charge-fill me-1"></i> Bron qilishni tasdiqlash</button>
-
-                    <div id="priceCalcPanel" class="p-3 bg-success bg-opacity-10 border border-success border-dashed rounded-3 mb-3 text-center d-none">
-                        <span class="text-secondary small d-block">Siz tanlagan vaqt uchun umumiy summa:</span>
-                        <h4 class="fw-bold text-success m-0" id="livePrice">0 so'm</h4>
-                        <small class="text-muted" id="liveHours">(0 soat)</small>
+                    <div id="priceCalcPanel" class="p-3 bg-light border border-success border-2 border-dashed rounded-3 mb-4 text-center d-none">
+                        <span class="text-secondary small d-block fw-bold">Jami to'lov summasi:</span>
+                        <h4 class="fw-bold text-success m-0 mt-1" id="livePrice">0 so'm</h4>
+                        <small class="text-muted fw-medium" id="liveHours">(0 soat)</small>
                     </div>
 
+                    <button sec:authorize="isAuthenticated()" type="submit" class="btn btn-success btn-lg w-100 fw-bold rounded-3 shadow-sm mb-2">
+                        Tasdiqlash va Bron Qilish
+                    </button>
+                    <button sec:authorize="isAnonymous()" type="button" onclick="loginWithState()" class="btn btn-outline-success btn-lg w-100 fw-bold rounded-3 mb-2">
+                        Bron qilish uchun kiring
+                    </button>
                 </form>
 
-                <div class="mt-2">
-                    <h6 class="fw-bold text-dark mb-3"><i class="bi bi-clock-history me-2 text-danger"></i>Yaqin oradagi band soatlar:</h6>
+                <hr class="text-muted opacity-25 my-4">
 
-                    <div th:if="${#lists.isEmpty(occupiedSlots)}" class="alert alert-light border border-dashed p-3 text-center rounded-3">
-                        <p class="text-muted small m-0"><i class="bi bi-calendar-x me-1"></i> Maydonda hozircha hech qanday band vaqtlar yo'q. Istalgan soatni tanlashingiz mumkin!</p>
-                    </div>
+                <h6 class="fw-bold text-dark mb-3"><i class="bi bi-clock-history me-2 text-danger"></i>Band qilingan vaqtlar:</h6>
+                <div th:if="${#lists.isEmpty(occupiedSlots)}" class="alert bg-sport-light border-0 p-3 text-center rounded-3">
+                    <p class="text-success fw-bold small m-0"><i class="bi bi-check-circle-fill me-1"></i> Maydon butunlay bo'sh!</p>
+                </div>
 
-                    <div th:if="${not #lists.isEmpty(occupiedSlots)}" class="d-flex flex-wrap gap-2" style="max-height: 150px; overflow-y: auto; padding: 5px;">
-                        <span th:each="slot : ${occupiedSlots}" class="slot-badge bg-danger bg-opacity-10 text-danger border border-danger border-opacity-20 fw-bold">
-                            <i class="bi bi-lock-fill me-1"></i>
-                            <span th:text="${#temporals.format(slot.startTime, 'dd-MM, HH:mm')}"></span> dan
-                            <span th:text="${#temporals.format(slot.endTime, 'HH:mm')}"></span> gacha
-                        </span>
+                <div th:if="${not #lists.isEmpty(occupiedSlots)}" class="d-flex flex-column gap-2" style="max-height: 200px; overflow-y: auto; padding-right: 5px;">
+                    <div th:each="slot : ${occupiedSlots}" class="slot-badge bg-danger text-white shadow-sm d-flex justify-content-between align-items-center">
+                        <span><i class="bi bi-lock-fill me-1 opacity-75"></i> <span th:text="${#temporals.format(slot.startTime, 'dd-MMM')}"></span></span>
+                        <span class="fw-bold" th:text="|${#temporals.format(slot.startTime, 'HH:mm')} - ${#temporals.format(slot.endTime, 'HH:mm')}|"></span>
                     </div>
                 </div>
             </div>
@@ -190,7 +215,7 @@
     </div>
 </div>
 
-<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+<div th:replace="~{fragments :: footer-scripts}"></div>
 
 <script th:inline="javascript">
     document.addEventListener("DOMContentLoaded", function () {
@@ -198,20 +223,11 @@
         const endTimeInput = document.getElementById("endTime");
         const bookingForm = document.getElementById("bookingForm");
 
-        /**
-         * 1. MINIMAL SANANI SOZLACH: Sekundlar xato bermasligi uchun faqat toza minutgacha chegaralash
-         */
         function updateMinDateTime() {
             const now = new Date();
-            const year = now.getFullYear();
-            const month = String(now.getMonth() + 1).padStart(2, '0');
-            const day = String(now.getDate()).padStart(2, '0');
-            const hours = String(now.getHours()).padStart(2, '0');
-            const minutes = String(now.getMinutes()).padStart(2, '0');
+            now.setMinutes(now.getMinutes() - now.getTimezoneOffset());
+            const currentDateTimeStr = now.toISOString().slice(0, 16);
 
-            const currentDateTimeStr = `${year}-${month}-${day}T${hours}:${minutes}`;
-
-            // O'tmish sekundlari backend bilan urishmasligi uchun minimallarni o'rnatamiz
             startTimeInput.min = currentDateTimeStr;
             endTimeInput.min = currentDateTimeStr;
         }
@@ -219,57 +235,52 @@
         updateMinDateTime();
         setInterval(updateMinDateTime, 60000);
 
-        /**
-         * 2. DINAMIK AUTOMATIC SURISH: Boshlanish tanlansa tugash srazu +1 soat minimal bo'ladi
-         */
         startTimeInput.addEventListener("change", function () {
             if (startTimeInput.value) {
                 const startDate = new Date(startTimeInput.value);
                 startDate.setHours(startDate.getHours() + 1);
 
-                const year = startDate.getFullYear();
-                const month = String(startDate.getMonth() + 1).padStart(2, '0');
-                const day = String(startDate.getDate()).padStart(2, '0');
-                const hours = String(startDate.getHours()).padStart(2, '0');
-                const minutes = String(startDate.getMinutes()).padStart(2, '0');
+                startDate.setMinutes(startDate.getMinutes() - startDate.getTimezoneOffset());
+                endTimeInput.min = startDate.toISOString().slice(0, 16);
 
-                endTimeInput.min = `${year}-${month}-${day}T${hours}:${minutes}`;
-
-                if (!endTimeInput.value || new Date(endTimeInput.value) < startDate) {
+                if (!endTimeInput.value || new Date(endTimeInput.value) < new Date(startTimeInput.value)) {
                     endTimeInput.value = endTimeInput.min;
                 }
             }
         });
 
-        /**
-         * 3. PROFESSIONAL JS VALIDATION: Backendga borishdan oldin sekundlarni dynamic bufferini tekshirish
-         */
-        bookingForm.addEventListener("submit", function (event) {
-            const start = new Date(startTimeInput.value);
-            const end = new Date(endTimeInput.value);
+        if(bookingForm) {
+            bookingForm.addEventListener("submit", function (event) {
+                const start = new Date(startTimeInput.value);
+                const end = new Date(endTimeInput.value);
+                const nowWithBuffer = new Date(Date.now() - 5 * 60000);
 
-            // 15 daqiqalik dynamic buffer (orqaga qaytish kechikishlarini oldini oladi)
-            const nowWithBuffer = new Date(Date.now() - 15 * 60000);
+                if (start < nowWithBuffer) {
+                    alert("Xatolik: O'tmishdagi vaqtga bron buyurtma qilib bo'lmaydi!");
+                    event.preventDefault(); return;
+                }
+                if (start >= end) {
+                    alert("Xatolik: Tugash vaqti boshlanish vaqtidan keyin bo'lishi shart!");
+                    event.preventDefault(); return;
+                }
+                const diffInMinutes = (end - start) / 1000 / 60;
+                if (diffInMinutes < 60) {
+                    alert("Xatolik: Sport maydonini kamida 1 soatga bron qilishingiz kerak!");
+                    event.preventDefault(); return;
+                }
+            });
+        }
 
-            if (start < nowWithBuffer) {
-                alert("Xatolik: O'tmishdagi vaqtga bron buyurtma qilib bo'lmaydi!");
-                event.preventDefault();
-                return;
-            }
+        // Sahifa qayta yuklanganda (Logindan kelganda) vaqtlarni URL-dan o'qish
+        const urlParams = new URLSearchParams(window.location.search);
+        const savedStart = urlParams.get('savedStart');
+        const savedEnd = urlParams.get('savedEnd');
 
-            if (start >= end) {
-                alert("Xatolik: Tugash vaqti boshlanish vaqtidan keyin bo'lishi shart!");
-                event.preventDefault();
-                return;
-            }
-
-            const diffInMinutes = (end - start) / 1000 / 60;
-            if (diffInMinutes < 60) {
-                alert("Xatolik: Sport maydonini kamida 1 soatga (60 daqiqa) bron qilishingiz kerak!");
-                event.preventDefault();
-                return;
-            }
-        });
+        if (savedStart && savedEnd) {
+            startTimeInput.value = savedStart;
+            endTimeInput.value = savedEnd;
+            updateLivePrice();
+        }
     });
 
     const pricePerHour = /*[[${field.priceHour}]]*/ 0;
@@ -290,7 +301,7 @@
                 const total = hours * pricePerHour;
 
                 priceCalcPanel.classList.remove("d-none");
-                livePrice.innerText = total.toLocaleString() + " so'm";
+                livePrice.innerText = total.toLocaleString('en-US') + " so'm";
                 liveHours.innerText = `(${hours.toFixed(1)} soat uchun)`;
                 return;
             }
@@ -299,6 +310,27 @@
     }
     startTimeInput.addEventListener("change", updateLivePrice);
     endTimeInput.addEventListener("change", updateLivePrice);
+
+    // Loginga kirishdan oldin kiritilgan vaqtlarni ushlab, URL orqali yuborish
+    window.loginWithState = function() {
+        const start = startTimeInput.value;
+        const end = endTimeInput.value;
+        const fieldId = /*[[${field.id}]]*/ '';
+
+        let redirectPath = "/fields/" + fieldId;
+
+        if (start && end) {
+            redirectPath += "?savedStart=" + encodeURIComponent(start) + "&savedEnd=" + encodeURIComponent(end);
+        }
+
+        window.location.href = "/auth/login?redirect=" + encodeURIComponent(redirectPath);
+    };
+
+    // 🟢 YANGI MANTIQ: Yulduzcha bosilganda qiymatni yashirin inputga berib formani jo'natish
+    window.submitRating = function(starsValue) {
+        document.getElementById("selectedStars").value = starsValue;
+        document.getElementById("ratingForm").submit();
+    };
 </script>
 
 </body>

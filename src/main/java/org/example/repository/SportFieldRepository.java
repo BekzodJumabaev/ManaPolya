@@ -2,6 +2,7 @@ package org.example.repository;
 
 import org.example.entity.District;
 import org.example.entity.SportField;
+import org.example.enums.FieldStatus;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.JpaRepository;
@@ -24,4 +25,8 @@ public interface SportFieldRepository extends JpaRepository<SportField, Long>, J
     Page<SportField> findByCriteria(@Param("search") String search, Pageable pageable);
 
     List<SportField> findByOwnerUsername(String username);
+
+    List<SportField> findByStatus(FieldStatus fieldStatus);
+
+    long countByStatus(FieldStatus fieldStatus);
 }

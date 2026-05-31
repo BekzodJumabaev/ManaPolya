@@ -1,162 +1,404 @@
 <!DOCTYPE html>
-<html xmlns:th="http://www.thymeleaf.org">
+<html xmlns:th="http://www.thymeleaf.org" xmlns:sec="http://www.thymeleaf.org/extras/spring-security">
 <head>
-    <meta charset="UTF-8">
-    <title>Shaxsiy Kabinet - ManaPolya</title>
-    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
-    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.1/font/bootstrap-icons.css">
+    <th:block th:replace="~{fragments :: header-assets}"></th:block>
+    <title>Boshqaruv Paneli - ManaPolya</title>
+
     <style>
-        body { background-color: #f4f7f6; }
-        .card-custom { border-radius: 16px; border: none; box-shadow: 0 5px 25px rgba(0,0,0,0.04); }
-        .table-custom th { font-weight: 600; font-size: 0.85rem; text-transform: uppercase; letter-spacing: 0.5px; }
-        .btn-action { border-radius: 8px; font-weight: 500; transition: all 0.2s; }
-        .btn-action:hover { transform: translateY(-1px); }
+        /* SPORT-TECH ADVANCED INTERFACE */
+        body {
+            background-color: #f1f5f9;
+            color: #0f172a;
+            font-family: 'Plus Jakarta Sans', sans-serif;
+            background-image:
+                    linear-gradient(135deg, rgba(16, 185, 129, 0.05) 0%, rgba(37, 99, 235, 0.03) 100%),
+                    linear-gradient(to right, rgba(0,0,0,0.02) 1px, transparent 1px),
+                    linear-gradient(to bottom, rgba(0,0,0,0.02) 1px, transparent 1px);
+            background-size: 100% 100%, 40px 40px, 40px 40px;
+            background-attachment: fixed;
+        }
+
+        /* Glassmorphism Sport Cards */
+        .sport-card {
+            border: 1px solid rgba(255, 255, 255, 0.8);
+            border-radius: 24px;
+            background: rgba(255, 255, 255, 0.85);
+            backdrop-filter: blur(20px);
+            -webkit-backdrop-filter: blur(20px);
+            box-shadow: 0 10px 30px -5px rgba(51, 65, 85, 0.08);
+            padding: 28px;
+            transition: all 0.3s ease;
+        }
+        .sport-card:hover {
+            box-shadow: 0 20px 40px -10px rgba(51, 65, 85, 0.12);
+            border-color: rgba(16, 185, 129, 0.2);
+        }
+
+        /* Metrics Widgets with Neo-Glow */
+        .widget-sport {
+            background: rgba(255, 255, 255, 0.9);
+            border: 1px solid #e2e8f0;
+            border-radius: 22px;
+            padding: 24px;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            position: relative;
+            transition: all 0.3s ease;
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.02);
+        }
+        .widget-sport:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 12px 24px rgba(16, 185, 129, 0.08);
+        }
+        .widget-sport::before {
+            content: ''; position: absolute; left: 0; top: 0; bottom: 0; width: 6px; border-radius: 22px 0 0 22px;
+        }
+        .w-green::before { background: #10b981; }
+        .w-blue::before { background: #2563eb; }
+        .w-orange::before { background: #f59e0b; }
+
+        .icon-badge {
+            width: 54px; height: 54px; border-radius: 16px;
+            display: flex; align-items: center; justify-content: center; font-size: 1.6rem;
+        }
+        .bg-glow-green { background: #d1fae5; color: #10b981; }
+        .bg-glow-blue { background: #dbeafe; color: #2563eb; }
+        .bg-glow-orange { background: #fef3c7; color: #f59e0b; }
+
+        /* Scrollers */
+        .arena-scroll-box { max-height: 310px; overflow-y: auto; padding-right: 4px; }
+        .arena-mini-item {
+            background: rgba(248, 250, 252, 0.8);
+            border: 1px solid #e2e8f0;
+            border-radius: 18px;
+            padding: 16px;
+            margin-bottom: 12px;
+            transition: all 0.2s ease;
+        }
+        .arena-mini-item:hover {
+            border-color: #10b981;
+            background: #ffffff;
+            transform: translateX(4px);
+        }
+
+        /* Clean Table Styles */
+        .registry-scroll-area {
+            max-height: 590px;
+            overflow-y: auto;
+            border-radius: 18px;
+            border: 1px solid #e2e8f0;
+        }
+        .table-sport { margin: 0; }
+        .table-sport thead th {
+            position: sticky; top: 0; background: #f8fafc !important;
+            color: #475569; font-weight: 700; font-size: 0.8rem;
+            text-transform: uppercase; letter-spacing: 0.8px;
+            padding: 16px; border-bottom: 2px solid #e2e8f0; z-index: 10;
+        }
+        .table-sport tbody tr { transition: all 0.2s; }
+        .table-sport tbody tr:nth-child(even) { background-color: rgba(248, 250, 252, 0.5); }
+        .table-sport tbody tr:hover { background-color: #f1f5f9; }
+        .table-sport tbody td { padding: 16px; border-bottom: 1px solid #e2e8f0; }
+
+        /* Content Aesthetics */
+        .td-customer { color: #1e40af; font-weight: 700; }
+        .td-field-badge { background-color: #e0f2fe; color: #0369a1; border: 1px solid #bae6fd; font-weight: 600; padding: 6px 12px; border-radius: 8px; display: inline-block; }
+        .td-income { color: #0f766e; font-weight: 800; font-size: 1rem; }
+
+        /* Modern Status Badge System */
+        .status-dot-pill {
+            padding: 6px 14px; border-radius: 50px; font-size: 0.75rem; font-weight: 700;
+            display: inline-flex; align-items: center; gap: 8px;
+        }
+        .status-dot-pill::before { content: ''; width: 6px; height: 6px; border-radius: 50%; }
+        .badge-faol { background: #d1fae5; color: #065f46; }
+        .badge-faol::before { background: #10b981; }
+        .badge-yakun { background: #f1f5f9; color: #475569; border: 1px solid #e2e8f0; }
+        .badge-yakun::before { background: #94a3b8; }
+        .badge-bekor { background: #fee2e2; color: #991b1b; }
+        .badge-bekor::before { background: #ef4444; }
+
+        .btn-round-action {
+            width: 36px; height: 36px; border-radius: 12px;
+            display: inline-flex; align-items: center; justify-content: center;
+            border: 1px solid #e2e8f0; background: #ffffff; color: #64748b; transition: 0.2s;
+        }
+        .btn-round-action:hover { background: #0f172a; color: #ffffff; transform: scale(1.05); }
+
+        .btn-cancel-sport {
+            font-size: 0.8rem; font-weight: 700; border-radius: 8px; padding: 6px 12px; transition: 0.2s;
+        }
     </style>
 </head>
 <body>
 
-<nav class="navbar navbar-expand-lg navbar-dark bg-success shadow-sm py-3">
-    <div class="container">
-        <a class="navbar-brand fw-bold fs-4" href="/"><i class="bi bi-shield-fill-check me-2"></i>ManaPolya</a>
-        <div class="ms-auto d-flex align-items-center gap-3">
-            <a href="/" class="btn btn-outline-light btn-sm btn-action px-3"><i class="bi bi-house-door me-1"></i> Bosh sahifa</a>
-        </div>
-    </div>
-</nav>
+<div th:replace="~{fragments :: navbar}"></div>
 
-<div class="container my-5">
+<div class="container-fluid px-md-5 my-5">
 
-    <div th:if="${message}" class="alert alert-success alert-dismissible fade show rounded-3 shadow-sm mb-4 border-0 border-start border-success border-4" role="alert">
+    <div th:if="${message != null or successMessage != null}" class="alert alert-success alert-dismissible fade show rounded-4 border-0 shadow-sm mb-4" role="alert">
         <div class="d-flex align-items-center">
             <i class="bi bi-check-circle-fill text-success fs-4 me-3"></i>
-            <div class="fw-medium text-success" th:text="${message}"></div>
+            <div class="fw-medium text-success" th:text="${message ?: successMessage}"></div>
         </div>
-        <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+        <button type="button" class="btn-close mt-1" data-bs-dismiss="alert"></button>
     </div>
 
-    <div th:if="${error}" class="alert alert-danger alert-dismissible fade show rounded-3 shadow-sm mb-4 border-0 border-start border-danger border-4" role="alert">
+    <div th:if="${error != null or errorMessage != null}" class="alert alert-danger alert-dismissible fade show rounded-4 border-0 shadow-sm mb-4" role="alert">
         <div class="d-flex align-items-center">
             <i class="bi bi-exclamation-triangle-fill text-danger fs-4 me-3"></i>
-            <div class="fw-medium text-danger" th:text="${error}"></div>
+            <div class="fw-medium text-danger" th:text="${error ?: errorMessage}"></div>
         </div>
-        <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+        <button type="button" class="btn-close mt-1" data-bs-dismiss="alert"></button>
     </div>
 
-    <div class="row g-4" th:if="${dashboard.isOwner}">
+    <div th:if="${dashboard.isOwner}">
 
-        <div class="col-lg-4">
-            <div class="card card-custom p-3 bg-white">
-                <div class="d-flex justify-content-between align-items-center mb-3 pb-2 border-bottom">
-                    <h5 class="fw-bold m-0 text-dark"><i class="bi bi-building text-success me-2"></i>Maydonlarim</h5>
-                    <a href="/fields/create" class="btn btn-sm btn-success btn-action px-3 fw-bold">+ Yangi</a>
+        <div class="row g-4 mb-4">
+            <div class="col-xl-4 col-md-6">
+                <div class="widget-sport w-green shadow-sm">
+                    <div>
+                        <span class="text-muted small fw-bold text-uppercase d-block mb-1">Faol maydonlarim</span>
+                        <h3 class="fw-bold m-0 text-dark" th:text="${#lists.size(dashboard.myFields)}">0</h3>
+                    </div>
+                    <div class="icon-badge bg-glow-green"><i class="bi bi-trophy-fill"></i></div>
                 </div>
-
-                <div class="list-group list-group-flush">
-                    <div th:each="f : ${dashboard.myFields}" class="list-group-item d-flex justify-content-between align-items-center px-0 py-3 border-bottom-dashed">
-                        <div>
-                            <h6 class="fw-bold m-0 text-dark" th:text="${f.name}"></h6>
-                            <small class="text-success fw-medium" th:text="${#numbers.formatDecimal(f.priceHour, 0, 'WHITESPACE', 0, 'POINT')} + ' so\'m/soat'"></small>
-                        </div>
-                        <div class="d-flex gap-1">
-                            <a th:href="@{/fields/{id}(id=${f.id})}" class="btn btn-sm btn-light text-secondary border btn-action" title="Ko'rish"><i class="bi bi-eye"></i></a>
-                            <a th:href="@{/fields/{id}/edit(id=${f.id})}" class="btn btn-sm btn-light text-warning border btn-action" title="Tahrirlash"><i class="bi bi-pencil"></i></a>
-                            <form th:action="@{|/fields/${f.id}/delete|}" method="post" onsubmit="return confirm('Haqiqatdan ham ushbu maydonni o\'chirmoqchimisiz?');" class="d-inline">
-                                <button type="submit" class="btn btn-sm btn-light text-danger border btn-action" title="O'chirsh"><i class="bi bi-trash"></i></button>
-                            </form>
-                        </div>
+            </div>
+            <div class="col-xl-4 col-md-6">
+                <div class="widget-sport w-blue shadow-sm">
+                    <div>
+                        <span class="text-muted small fw-bold text-uppercase d-block mb-1">Umumiy buyurtmalar</span>
+                        <h3 class="fw-bold m-0 text-dark" th:text="${#lists.size(dashboard.myCustomerBookings)}">0</h3>
                     </div>
-
-                    <div th:if="${#lists.isEmpty(dashboard.myFields)}" class="text-center text-muted py-5">
-                        <i class="bi bi-folder-x fs-1 text-secondary d-block mb-2"></i>
-                        <p class="small m-0 fw-medium">Sizda hali sport maydonlari yo'q.</p>
+                    <div class="icon-badge bg-glow-blue"><i class="bi bi-calendar2-week-fill"></i></div>
+                </div>
+            </div>
+            <div class="col-xl-4 col-md-12">
+                <div class="widget-sport w-orange shadow-sm">
+                    <div>
+                        <span class="text-muted small fw-bold text-uppercase d-block mb-1">Kassa (Kiritilgan daromad)</span>
+                        <h3 class="fw-bold m-0 text-success"
+                            th:text="${not #lists.isEmpty(dashboard.myCustomerBookings.?[status.name() != 'CANCELLED']) ? #numbers.formatDecimal(#aggregates.sum(dashboard.myCustomerBookings.?[status.name() != 'CANCELLED'].![totalPrice]), 0, 'COMMA', 0, 'POINT') + ' UZS' : '0 UZS'}">0 UZS</h3>
                     </div>
+                    <div class="icon-badge bg-glow-orange"><i class="bi bi-currency-exchange"></i></div>
                 </div>
             </div>
         </div>
 
-        <div class="col-lg-8">
-            <div class="card card-custom p-4 bg-white">
-                <h5 class="fw-bold text-dark mb-4 pb-2 border-bottom"><i class="bi bi-people-fill text-primary me-2"></i>Kelib tushgan bronlar (Ijarachilar)</h5>
+        <div class="row g-4">
+            <div class="col-lg-4">
+                <div class="card sport-card">
+                    <div class="d-flex justify-content-between align-items-center mb-3 pb-2 border-bottom">
+                        <h5 class="fw-bold text-dark m-0"><i class="bi bi-duffle-fill text-success me-2"></i>Sport maydonlarim</h5>
+                        <a href="/fields/create" class="btn btn-sm btn-success rounded-3 fw-bold px-3 py-1.5 shadow-sm"><i class="bi bi-plus-lg me-1"></i> Qo'shish</a>
+                    </div>
 
-                <div class="table-responsive">
-                    <table class="table table-hover table-bordered align-middle table-custom m-0 border-light">
-                        <thead class="table-light text-secondary">
-                        <tr>
-                            <th>Mijoz (FIO)</th>
-                            <th>Maydon</th>
-                            <th>Boshlanish</th>
-                            <th>Tugash</th>
-                            <th>Summa</th>
-                            <th class="text-center">Status</th>
-                        </tr>
-                        </thead>
-                        <tbody>
-                        <tr th:each="b : ${dashboard.myCustomerBookings}">
-                            <td class="fw-bold text-dark" th:text="${b.customerFullName}"></td>
-                            <td class="fw-medium text-secondary" th:text="${b.fieldName}"></td>
-                            <td class="small text-muted" th:text="${#temporals.format(b.startTime, 'dd-MM-yyyy HH:mm')}"></td>
-                            <td class="small text-muted" th:text="${#temporals.format(b.endTime, 'dd-MM-yyyy HH:mm')}"></td>
-                            <td class="text-success fw-bold" th:text="${#numbers.formatDecimal(b.totalPrice, 0, 'WHITESPACE', 0, 'POINT')} + ' so\'m'"></td>
-                            <td class="text-center">
-                                <span class="badge rounded-pill px-3 py-2" th:classappend="${b.status.name() == 'CONFIRMED' ? 'bg-success bg-opacity-10 text-success' : 'bg-danger bg-opacity-10 text-danger'}" th:text="${b.status}"></span>
-                            </td>
-                        </tr>
-                        <tr th:if="${#lists.isEmpty(dashboard.myCustomerBookings)}">
-                            <td colspan="6" class="text-center text-muted py-5fw-medium">Sizning maydonlaringizni hali hech kim ijara olmadi.</td>
-                        </tr>
-                        </tbody>
-                    </table>
+                    <div class="arena-scroll-box">
+                        <div th:each="f : ${dashboard.myFields}" class="arena-mini-item">
+                            <div class="d-flex justify-content-between align-items-start">
+                                <span class="fw-bold text-dark text-truncate d-block" style="max-width: 65%; font-size: 0.95rem;" th:text="${f.name}"></span>
+
+                                <span class="badge rounded-pill py-1 px-2" style="font-size: 0.65rem; font-weight: 700;"
+                                      th:classappend="${f.status != null and f.status.name() == 'APPROVED' ? 'bg-success bg-opacity-10 text-success border border-success-subtle' : (f.status != null and f.status.name() == 'PENDING' ? 'bg-warning bg-opacity-10 text-warning border border-warning-subtle' : 'bg-danger bg-opacity-10 text-danger border border-danger-subtle')}"
+                                      th:text="${f.status != null and f.status.name() == 'APPROVED' ? 'Tasdiqlangan' : (f.status != null and f.status.name() == 'PENDING' ? 'Kutilmoqda' : 'Rad etilgan (O''chirilgan)')}"></span>
+                            </div>
+                            <div class="d-flex justify-content-between align-items-center mt-2 pt-2 border-top border-light">
+                                <span class="text-success fw-bold small" th:text="${#numbers.formatDecimal(f.priceHour, 0, 'COMMA', 0, 'POINT')} + ' so\'m/s'"></span>
+
+                                <div th:if="${f.status == null or f.status.name() != 'REJECTED'}" class="d-flex gap-1">
+                                    <a th:href="@{/fields/{id}(id=${f.id})}" class="btn-round-action" title="Ko'rish"><i class="bi bi-eye"></i></a>
+
+                                    <a th:href="@{/fields/{id}/edit(id=${f.id})}" class="btn-round-action text-warning" title="Tahrirlash"><i class="bi bi-pencil"></i></a>
+
+                                    <form th:if="${f.status != null and f.status.name() == 'APPROVED'}" th:action="@{|/fields/${f.id}/delete|}" method="post" onsubmit="return confirm('Ushbu sport maydonini o\'chirasizmi? (Barcha kelajakdagi bronlar avtomatik bekor qilinadi)');" class="d-inline">
+                                        <button type="submit" class="btn-round-action text-danger" title="O'chirish"><i class="bi bi-trash"></i></button>
+                                    </form>
+                                </div>
+                                <div th:if="${f.status != null and f.status.name() == 'REJECTED'}" class="text-muted small">
+                                </div>
+                            </div>
+                        </div>
+                        <div th:if="${#lists.isEmpty(dashboard.myFields)}" class="text-center text-muted py-4">
+                            <p class="small m-0">Maydonlar kiritilmagan.</p>
+                        </div>
+                    </div>
                 </div>
-            </div>
-        </div>
-    </div>
 
-    <div class="row mt-4">
-        <div class="col-12">
-            <div class="card card-custom p-4 bg-white">
-                <h5 class="fw-bold text-dark mb-4 pb-2 border-bottom"><i class="bi bi-clock-history text-success me-2"></i>Mening buyurtmalarim (Siz qilgan ijaralar)</h5>
+                <div class="card sport-card mb-0 mt-4">
+                    <h5 class="fw-bold text-dark mb-3 pb-2 border-bottom"><i class="bi bi-person-video3 text-primary me-2"></i>Mening shaxsiy ijaralarim</h5>
+                    <div class="arena-scroll-box" style="max-height: 250px;">
+                        <div th:each="b : ${dashboard.myOwnBookings}" class="p-3 bg-light rounded-4 mb-2 border">
+                            <div class="d-flex justify-content-between align-items-start mb-1">
+                                <span class="fw-bold text-dark text-truncate small d-block" style="max-width: 65%;" th:text="${b.fieldName}"></span>
+                                <span class="badge rounded-pill px-2 py-0.5" style="font-size: 0.65rem;"
+                                      th:classappend="${b.status != null and b.status.name() == 'CONFIRMED' ? 'bg-success bg-opacity-10 text-success' : (b.status != null and b.status.name() == 'COMPLETED' ? 'bg-info bg-opacity-10 text-info' : 'bg-danger bg-opacity-10 text-danger')}"
+                                      th:text="${b.status != null and b.status.name() == 'CONFIRMED' ? 'Faol' : (b.status != null and b.status.name() == 'COMPLETED' ? 'Yakunlangan' : 'Bekor qilingan')}"></span>
+                            </div>
+                            <div class="text-muted small">
+                                <i class="bi bi-calendar3 me-1"></i> <span th:text="${#temporals.format(b.startTime, 'dd-MM-yyyy')}"></span>
+                                (<span th:text="${#temporals.format(b.startTime, 'HH:mm')}"></span> - <span th:text="${#temporals.format(b.endTime, 'HH:mm')}"></span>)
+                            </div>
 
-                <div class="table-responsive">
-                    <table class="table table-hover table-bordered align-middle table-custom m-0 border-light">
-                        <thead class="table-light text-secondary">
-                        <tr>
-                            <th>Maydon nomi</th>
-                            <th>Boshlanish vaqti</th>
-                            <th>Tugash vaqti</th>
-                            <th>Umumiy summa</th>
-                            <th class="text-center">Holati</th>
-                            <th class="text-center">Amal</th>
-                        </tr>
-                        </thead>
-                        <tbody>
-                        <tr th:each="b : ${dashboard.myOwnBookings}">
-                            <td class="fw-bold text-dark" th:text="${b.fieldName}"></td>
-                            <td class="small text-muted" th:text="${#temporals.format(b.startTime, 'dd-MM-yyyy HH:mm')}"></td>
-                            <td class="small text-muted" th:text="${#temporals.format(b.endTime, 'dd-MM-yyyy HH:mm')}"></td>
-                            <td class="text-success fw-bold" th:text="${#numbers.formatDecimal(b.totalPrice, 0, 'WHITESPACE', 0, 'POINT')} + ' so\'m'"></td>
-                            <td class="text-center">
-                                <span class="badge rounded-pill px-3 py-2" th:classappend="${b.status.name() == 'CONFIRMED' ? 'bg-success bg-opacity-10 text-success' : 'bg-danger bg-opacity-10 text-danger'}" th:text="${b.status}"></span>
-                            </td>
-                            <td class="text-center">
-                                <form th:if="${b.status.name() == 'CONFIRMED'}"
-                                      th:action="@{|/profile/bookings/${b.id}/cancel|}"
-                                      method="post"
-                                      onsubmit="return confirm('Haqiqatdan ham ushbu ijarani bekor qilmoqchimisiz?');">
-                                    <button type="submit" class="btn btn-sm btn-danger btn-action px-3 fw-semibold">
-                                        <i class="bi bi-x-circle me-1"></i> Ijarani bekor qilish
-                                    </button>
+                            <div th:if="${b.status != null and b.status.name() == 'CONFIRMED'}" class="mt-2 text-end">
+                                <form th:action="@{|/profile/bookings/${b.id}/cancel|}" method="post" onsubmit="return confirm('Ushbu ijarani bekor qilib maydonni ommaga ochasizmi?');">
+                                    <button type="submit" class="btn btn-sm btn-outline-danger" style="font-size:0.7rem; font-weight: 700; padding:2px 8px;">Vaqtni bo'shatish</button>
                                 </form>
-                                <span th:if="${b.status.name() == 'CANCELLED'}" class="text-muted small fw-medium"><i class="bi bi-info-circle me-1"></i>Bekor qilingan</span>
-                            </td>
-                        </tr>
-                        <tr th:if="${#lists.isEmpty(dashboard.myOwnBookings)}">
-                            <td colspan="6" class="text-center text-muted py-5">
-                                <i class="bi bi-calendar-x fs-1 d-block mb-3 text-secondary"></i>
-                                <span class="fw-medium">Sizda hozircha hech qanday faol ijaralar mavjud emas.</span>
-                            </td>
-                        </tr>
-                        </tbody>
-                    </table>
+                            </div>
+                        </div>
+                        <div th:if="${#lists.isEmpty(dashboard.myOwnBookings)}" class="text-center text-muted py-4">
+                            <p class="small m-0">Siz o'z maydoningizdan vaqt bron qilmagansiz.</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="col-lg-8">
+                <div class="card sport-card h-100 d-flex flex-column mb-0">
+                    <div class="d-flex justify-content-between align-items-center mb-4 flex-wrap gap-2 pb-2 border-bottom">
+                        <h5 class="fw-bold text-dark m-0"><i class="bi bi-clipboard-data-fill text-primary me-2"></i>Mijozlar buyurtmalari ro'yxati</h5>
+                        <button type="button" class="btn btn-primary rounded-3 fw-bold d-flex align-items-center py-2 px-4 shadow-sm btn-sm" data-bs-toggle="modal" data-bs-target="#offlineBookingModal" th:disabled="${#lists.isEmpty(dashboard.myFields)}">
+                            <i class="bi bi-telephone-plus-fill me-2"></i>Offline band qilish
+                        </button>
+                    </div>
+
+                    <div class="registry-scroll-area flex-grow-1">
+                        <table class="table align-middle table-sport">
+                            <thead>
+                            <tr>
+                                <th>Mijoz / Eslatma</th>
+                                <th>Sport Maydoni</th>
+                                <th>Sana va vaqt</th>
+                                <th>Tushum summasi</th>
+                                <th class="text-center">Holati / Amal</th>
+                            </tr>
+                            </thead>
+                            <tbody>
+                            <tr th:each="b : ${dashboard.myCustomerBookings}">
+                                <td class="td-customer">
+                                    <span th:text="${!#strings.isEmpty(b.customerFullName) ? b.customerFullName : b.notes}"></span>
+                                    <div class="mt-1">
+                                        <span th:if="${#strings.isEmpty(b.customerFullName)}" class="badge bg-secondary bg-opacity-10 text-secondary border px-2 py-0.5" style="font-size: 0.65rem;">
+                                            <i class="bi bi-telephone-fill me-1"></i> Offline orqali
+                                        </span>
+                                        <span th:if="${!#strings.isEmpty(b.customerFullName)}" class="badge bg-primary bg-opacity-10 text-primary border border-primary-subtle px-2 py-0.5" style="font-size: 0.65rem;">
+                                            <i class="bi bi-phone-vibrate-fill me-1"></i> Onlayn ilova
+                                        </span>
+                                    </div>
+                                </td>
+                                <td><span class="td-field-badge" th:text="${b.fieldName}"></span></td>
+                                <td style="white-space: nowrap;">
+                                    <div class="fw-bold text-dark" th:text="${#temporals.format(b.startTime, 'dd-MM-yyyy')}"></div>
+                                    <div class="text-muted small">
+                                        <span th:text="${#temporals.format(b.startTime, 'HH:mm')}"></span> - <span th:text="${#temporals.format(b.endTime, 'HH:mm')}"></span>
+                                    </div>
+                                </td>
+                                <td class="td-income" th:text="${#numbers.formatDecimal(b.totalPrice, 0, 'COMMA', 0, 'POINT')} + ' UZS'"></td>
+                                <td class="text-center">
+                                    <div class="d-flex flex-column align-items-center gap-2 justify-content-center">
+                                        <span class="status-dot-pill"
+                                              th:classappend="${b.status != null and b.status.name() == 'CONFIRMED' ? 'badge-faol' : (b.status != null and b.status.name() == 'COMPLETED' ? 'badge-yakun' : 'badge-bekor')}"
+                                              th:text="${b.status != null and b.status.name() == 'CONFIRMED' ? 'Faol' : (b.status != null and b.status.name() == 'COMPLETED' ? 'Yakunlangan' : 'Bekor qilingan')}"></span>
+
+                                        <form th:if="${b.status != null and b.status.name() == 'CONFIRMED'}" th:action="@{|/profile/bookings/${b.id}/cancel|}" method="post" onsubmit="return confirm('Mijozning ushbu ijarasini bekor qilasizmi?');">
+                                            <button type="submit" class="btn btn-sm btn-outline-danger py-0 px-2 mt-1 shadow-sm" style="font-size: 0.7rem; font-weight: bold;">
+                                                Bekor qilish
+                                            </button>
+                                        </form>
+                                    </div>
+                                </td>
+                            </tr>
+                            <tr th:if="${#lists.isEmpty(dashboard.myCustomerBookings)}">
+                                <td colspan="5" class="text-center text-muted py-5">
+                                    Sizning maydonlaringizga hali hech kim buyurtma bermagan.
+                                </td>
+                            </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+
+    <div th:if="${!dashboard.isOwner}">
+
+        <div class="row g-4 mb-4">
+            <div class="col-md-6">
+                <div class="widget-sport w-blue shadow-sm">
+                    <div>
+                        <span class="text-muted small fw-bold text-uppercase d-block mb-1">Mening ijaralarim soni</span>
+                        <h3 class="fw-bold m-0 text-dark" th:text="${#lists.size(dashboard.myOwnBookings)}">0</h3>
+                    </div>
+                    <div class="icon-badge bg-glow-blue"><i class="bi bi-calendar-heart-fill"></i></div>
+                </div>
+            </div>
+            <div class="col-md-6">
+                <div class="widget-sport w-green shadow-sm">
+                    <div>
+                        <span class="text-muted small fw-bold text-uppercase d-block mb-1">Xarajatlarim Jami</span>
+                        <h3 class="fw-bold m-0 text-success"
+                            th:text="${not #lists.isEmpty(dashboard.myOwnBookings.?[status.name() != 'CANCELLED']) ? #numbers.formatDecimal(#aggregates.sum(dashboard.myOwnBookings.?[status.name() != 'CANCELLED'].![totalPrice]), 0, 'COMMA', 0, 'POINT') + ' UZS' : '0 UZS'}">0 UZS</h3>
+                    </div>
+                    <div class="icon-badge bg-glow-green"><i class="bi bi-wallet2"></i></div>
+                </div>
+            </div>
+        </div>
+
+        <div class="row">
+            <div class="col-12">
+                <div class="card sport-card">
+                    <h5 class="fw-bold text-dark mb-4 pb-2 border-bottom">
+                        <i class="bi bi-lightning-charge-fill text-warning me-2"></i>Mening buyurtmalarim tarixi
+                    </h5>
+
+                    <div class="registry-scroll-area flex-grow-1">
+                        <table class="table align-middle table-sport table-hover m-0">
+                            <thead>
+                            <tr>
+                                <th>Sport maydoni</th>
+                                <th>Sana vaqti</th>
+                                <th>Umumiy to'lov</th>
+                                <th class="text-center">Buyurtma holati</th>
+                            </tr>
+                            </thead>
+                            <tbody>
+                            <tr th:each="b : ${dashboard.myOwnBookings}">
+                                <td>
+                                    <span class="td-field-badge" th:text="${b.fieldName}"></span>
+                                </td>
+                                <td style="white-space: nowrap;">
+                                    <div class="fw-bold text-dark" th:text="${#temporals.format(b.startTime, 'dd-MM-yyyy')}"></div>
+                                    <div class="text-muted small">
+                                        <span th:text="${#temporals.format(b.startTime, 'HH:mm')}"></span> - <span th:text="${#temporals.format(b.endTime, 'HH:mm')}"></span>
+                                    </div>
+                                </td>
+                                <td class="td-income" th:text="${#numbers.formatDecimal(b.totalPrice, 0, 'COMMA', 0, 'POINT')} + ' UZS'"></td>
+                                <td class="text-center">
+                                    <div class="d-flex flex-column align-items-center gap-2 justify-content-center">
+                                        <span class="status-dot-pill"
+                                              th:classappend="${b.status != null and b.status.name() == 'CONFIRMED' ? 'badge-faol' : (b.status != null and b.status.name() == 'COMPLETED' ? 'badge-yakun' : 'badge-bekor')}"
+                                              th:text="${b.status != null and b.status.name() == 'CONFIRMED' ? 'Faol' : (b.status != null and b.status.name() == 'COMPLETED' ? 'Yakunlangan' : 'Bekor qilingan')}"></span>
+
+                                        <form th:if="${b.status != null and b.status.name() == 'CONFIRMED'}" th:action="@{|/profile/bookings/${b.id}/cancel|}" method="post" onsubmit="return confirm('Ushbu ijarani bekor qilasizmi?');">
+                                            <button type="submit" class="btn btn-sm btn-danger btn-cancel-sport py-1 px-3 mt-1 shadow-sm">
+                                                Ijarani bekor qilish
+                                            </button>
+                                        </form>
+                                    </div>
+                                </td>
+                            </tr>
+                            <tr th:if="${#lists.isEmpty(dashboard.myOwnBookings)}">
+                                <td colspan="4" class="text-center text-muted py-5">
+                                    <i class="bi bi-calendar-x fs-2 d-block mb-2 opacity-40"></i>
+                                    Sizda hali hech qanday faol ijaralar mavjud emas.<br>
+                                    <a href="/" class="btn btn-success btn-sm rounded-3 fw-bold px-4 py-2 mt-3">Maydonlarni qidirish</a>
+                                </td>
+                            </tr>
+                            </tbody>
+                        </table>
+                    </div>
                 </div>
             </div>
         </div>
@@ -164,6 +406,80 @@
 
 </div>
 
-<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+<div th:if="${dashboard.isOwner}" class="modal fade" id="offlineBookingModal" tabindex="-1" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered">
+        <div class="modal-content rounded-4 border-0 shadow-lg">
+            <div class="modal-header border-bottom-0 bg-primary bg-opacity-10 pb-2">
+                <h5 class="modal-title fw-bold text-primary"><i class="bi bi-telephone-forward-fill me-2"></i>Offline band qilish</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+
+            <form th:action="@{/fields/offline-book}" method="post">
+                <div class="modal-body p-4 pt-3">
+                    <p class="text-muted small mb-4">Mijozlarni offline ijaraga kiritish paneli. Ushbu vaqtlar saytda boshqa foydalanuvchilar uchun avtomatik ravishda yopiladi.</p>
+
+                    <div class="mb-3">
+                        <label class="form-label fw-bold small text-dark">Maydonni tanlang</label>
+                        <select name="fieldId" class="form-select bg-light border-0 rounded-3" required>
+                            <option value="">Tanlang...</option>
+                            <option th:each="f : ${dashboard.myActiveFields}" th:value="${f.id}" th:text="${f.name}"></option>
+                        </select>
+                    </div>
+
+                    <div class="row g-3 mb-3">
+                        <div class="col-6">
+                            <label class="form-label fw-bold small text-dark">Boshlanish vaqti</label>
+                            <input type="datetime-local" name="startTime" id="offlineStart" class="form-control bg-light border-0 rounded-3" required>
+                        </div>
+                        <div class="col-6">
+                            <label class="form-label fw-bold small text-dark">Tugash vaqti</label>
+                            <input type="datetime-local" name="endTime" id="offlineEnd" class="form-control bg-light border-0 rounded-3" required>
+                        </div>
+                    </div>
+
+                    <div class="mb-2">
+                        <label class="form-label fw-bold small text-dark">Mijoz ismi yoki tel raqami</label>
+                        <input type="text" name="notes" class="form-control bg-light border-0 rounded-3" placeholder="Masalan: Jasur aka (93 123-45-67)" required>
+                    </div>
+                </div>
+
+                <div class="modal-footer border-top-0 pt-0 pb-4 px-4 d-flex gap-2">
+                    <button type="button" class="btn btn-light fw-bold flex-grow-1 rounded-3" data-bs-dismiss="modal">Yopish</button>
+                    <button type="submit" class="btn btn-primary fw-bold flex-grow-1 rounded-3"><i class="bi bi-calendar-plus me-1"></i>Saqlash</button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+
+<div th:replace="~{fragments :: footer-scripts}"></div>
+
+<script>
+    document.addEventListener("DOMContentLoaded", function () {
+        const startInput = document.getElementById("offlineStart");
+        const endInput = document.getElementById("offlineEnd");
+
+        if(startInput && endInput) {
+            const now = new Date();
+            now.setMinutes(now.getMinutes() - now.getTimezoneOffset());
+            const currentStr = now.toISOString().slice(0, 16);
+            startInput.min = currentStr;
+
+            startInput.addEventListener("change", function () {
+                if (startInput.value) {
+                    const startObj = new Date(startInput.value);
+                    startObj.setHours(startObj.getHours() + 1);
+                    startObj.setMinutes(startObj.getMinutes() - startObj.getTimezoneOffset());
+                    endInput.min = startObj.toISOString().slice(0, 16);
+
+                    if(!endInput.value || new Date(endInput.value) < new Date(startInput.value)){
+                        endInput.value = endInput.min;
+                    }
+                }
+            });
+        }
+    });
+</script>
+
 </body>
 </html>

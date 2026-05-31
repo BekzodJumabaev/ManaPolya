@@ -20,7 +20,7 @@ import java.time.LocalDateTime;
 public class Booking extends BaseEntity {
 
     @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "customer_id")
+    @JoinColumn(name = "customer_id", nullable = true)
     private User customer;
 
     @ManyToOne(fetch = FetchType.LAZY)
@@ -33,5 +33,7 @@ public class Booking extends BaseEntity {
 
     @Enumerated(EnumType.STRING)
     private BookingStatus status;
+
+    private String notes;
 
 }

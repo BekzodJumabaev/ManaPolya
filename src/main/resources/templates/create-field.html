@@ -1,45 +1,143 @@
 <!DOCTYPE html>
 <html xmlns:th="http://www.thymeleaf.org">
 <head>
+    <th:block th:replace="~{fragments :: header-assets}"></th:block>
     <meta charset="UTF-8">
     <title th:text="${isEdit} ? 'Maydonni tahrirlash | ManaPolya' : 'Yangi sport maydoni qo\'shish | ManaPolya'">Maydon Paneli</title>
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.1/font/bootstrap-icons.css">
     <script src="https://api-maps.yandex.ru/2.1/?lang=uz_UZ" type="text/javascript"></script>
+
     <style>
-        body { background-color: #f4f7f6; }
-        #map { width: 100%; height: 380px; border-radius: 12px; border: 2px solid #e9ecef; }
-        .card-custom { border-radius: 16px; border: none; box-shadow: 0 10px 30px rgba(0, 0, 0, 0.05); }
-        .form-label { color: #495057; }
-        .btn-success-custom { background-color: #198754; border: none; padding: 12px; border-radius: 10px; font-weight: 600; transition: all 0.2s; }
-        .btn-success-custom:hover { background-color: #146c43; transform: translateY(-1px); }
-        .btn-warning-custom { background-color: #ffc107; border: none; padding: 12px; border-radius: 10px; font-weight: 600; color: #212529; transition: all 0.2s; }
-        .btn-warning-custom:hover { background-color: #e0a800; transform: translateY(-1px); }
+        body {
+            background-color: #f1f5f9;
+            color: #0f172a;
+            font-family: 'Plus Jakarta Sans', sans-serif;
+            background-image:
+                    linear-gradient(135deg, rgba(16, 185, 129, 0.04) 0%, rgba(37, 99, 235, 0.02) 100%),
+                    linear-gradient(to right, rgba(0,0,0,0.01) 1px, transparent 1px),
+                    linear-gradient(to bottom, rgba(0,0,0,0.01) 1px, transparent 1px);
+            background-size: 100% 100%, 35px 35px, 35px 35px;
+            background-attachment: fixed;
+        }
+
+        .sport-premium-card {
+            border: 1px solid rgba(255, 255, 255, 0.8);
+            border-radius: 28px;
+            background: rgba(255, 255, 255, 0.88);
+            backdrop-filter: blur(20px);
+            -webkit-backdrop-filter: blur(20px);
+            box-shadow: 0 20px 40px -15px rgba(15, 23, 42, 0.08);
+        }
+
+        .form-label-custom {
+            font-weight: 700;
+            font-size: 0.85rem;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+            color: #475569;
+            margin-bottom: 8px;
+            display: block;
+        }
+
+        .input-cyber {
+            border: 1px solid #cbd5e1;
+            border-radius: 12px;
+            padding: 12px 16px;
+            font-size: 0.95rem;
+            background-color: #ffffff;
+            transition: all 0.2s ease;
+        }
+        .input-cyber:focus {
+            border-color: #10b981;
+            box-shadow: 0 0 0 4px rgba(16, 185, 129, 0.1);
+            background-color: #ffffff;
+        }
+
+        .upload-dropzone {
+            border: 2px dashed #cbd5e1;
+            border-radius: 18px;
+            padding: 32px 20px;
+            text-align: center;
+            background: rgba(248, 250, 252, 0.6);
+            cursor: pointer;
+            transition: all 0.2s ease;
+            position: relative;
+        }
+        .upload-dropzone:hover {
+            border-color: #10b981;
+            background: rgba(16, 185, 129, 0.02);
+        }
+        .upload-dropzone i {
+            font-size: 2.5rem;
+            color: #64748b;
+            transition: 0.2s;
+        }
+        .upload-dropzone:hover i {
+            color: #10b981;
+            transform: translateY(-3px);
+        }
+
+        .switch-card-custom {
+            border: 1px solid #e2e8f0;
+            border-radius: 14px;
+            padding: 16px 20px;
+            background: #ffffff;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            cursor: pointer;
+            transition: all 0.2s ease;
+        }
+        .switch-card-custom:hover {
+            border-color: #cbd5e1;
+            background-color: #f8fafc;
+        }
+
+        #map {
+            width: 100%;
+            height: 400px;
+            border-radius: 20px;
+            border: 1px solid #e2e8f0;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.02);
+        }
+
+        .btn-sport-submit {
+            border-radius: 14px;
+            padding: 14px;
+            font-weight: 700;
+            letter-spacing: 0.5px;
+            text-transform: uppercase;
+            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+        }
+        .btn-sport-submit:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 12px 20px rgba(16, 185, 129, 0.2);
+        }
     </style>
 </head>
 <body class="py-5">
 
 <div class="container">
     <div class="row justify-content-center">
-        <div class="col-lg-9">
-            <div class="card card-custom p-4 p-md-5 bg-white">
+        <div class="col-lg-10">
+            <div class="card sport-premium-card p-4 p-md-5">
 
                 <div class="d-flex align-items-center justify-content-between mb-4 pb-3 border-bottom">
-                    <div class="d-flex align-items-center">
-                        <a href="/profile/dashboard" class="btn btn-outline-secondary btn-sm rounded-3 me-3">
-                            <i class="bi bi-arrow-left"></i> Kabinetga qaytish
-                        </a>
-                        <h3 class="fw-bold m-0" th:classappend="${isEdit} ? 'text-warning' : 'text-success'">
-                            <i th:class="${isEdit} ? 'bi bi-pencil-square me-2' : 'bi bi-plus-circle-fill me-2'"></i>
-                            <span th:text="${isEdit} ? 'Maydon ma\'lumotlarini tahrirlash' : 'Yangi sport maydoni qo\'shish'"></span>
-                        </h3>
+                    <div class="d-flex align-items-center flex-wrap gap-2">
+                        <button type="button" onclick="goBackOrDashboard()" class="btn btn-light border btn-sm rounded-3 me-2 px-3 py-2 fw-bold text-secondary">
+                            <i class="bi bi-arrow-left me-1"></i> Orqaga
+                        </button>
+                        <h4 class="fw-bold m-0 text-dark">
+                            <i th:class="${isEdit} ? 'bi bi-pencil-square text-warning me-2' : 'bi bi-plus-circle-fill text-success me-2'"></i>
+                            <span th:text="${isEdit} ? 'Maydon ma\'lumotlarini yangilash' : 'Yangi sport maydoni yaratish'"></span>
+                        </h4>
                     </div>
-                    <span class="badge bg-success bg-opacity-10 text-success px-3 py-2 rounded-pill fw-semibold">Owner Mode</span>
                 </div>
 
-                <div th:if="${error}" class="alert alert-danger d-flex align-items-center rounded-3" role="alert">
-                    <i class="bi bi-exclamation-triangle-fill me-2"></i>
-                    <div th:text="${error}"></div>
+                <div th:if="${error}" class="alert alert-danger d-flex align-items-center rounded-3 border-0 shadow-sm" role="alert">
+                    <i class="bi bi-exclamation-triangle-fill fs-5 me-2"></i>
+                    <div class="fw-medium" th:text="${error}"></div>
                 </div>
 
                 <form id="fieldForm" th:action="${isEdit} ? @{|/fields/${fieldDto.id}/edit|} : @{/fields/create}" th:object="${fieldDto}" method="post" enctype="multipart/form-data">
@@ -49,111 +147,120 @@
                     <div class="row g-4">
 
                         <div class="col-md-6">
-                            <label class="form-label small fw-bold">Maydon nomi <span class="text-danger">*</span></label>
-                            <input type="text" th:field="*{name}" class="form-control form-control-lg rounded-3" required placeholder="Masalan: Bunyodkor mini-stadioni">
-                            <div class="text-danger small mt-1" th:if="${#fields.hasErrors('name')}" th:errors="*{name}"></div>
+                            <label class="form-label-custom">Sport maydoni nomi <span class="text-danger">*</span></label>
+                            <input type="text" th:field="*{name}" class="form-control input-cyber text-dark" required placeholder="Masalan: Paxtakor Arena Mini">
+                            <div class="text-danger small mt-1 fw-bold" th:if="${#fields.hasErrors('name')}" th:errors="*{name}"></div>
                         </div>
 
                         <div class="col-md-6">
-                            <label class="form-label small fw-bold">Soatbay narxi (so'mda) <span class="text-danger">*</span></label>
-                            <div class="input-group input-group-lg">
-                                <input type="number" th:field="*{priceHour}" class="form-control rounded-start-3" required placeholder="Masalan: 120000">
-                                <span class="input-group-text rounded-end-3 small bg-light text-muted">so'm</span>
+                            <label class="form-label-custom">Soatbay ijara narxi <span class="text-danger">*</span></label>
+                            <div class="input-group">
+                                <input type="number" th:field="*{priceHour}" class="form-control input-cyber rounded-start" required placeholder="Masalan: 150000">
+                                <span class="input-group-text bg-light text-secondary border fw-bold px-3" style="border-radius: 0 12px 12px 0;">UZS</span>
                             </div>
-                            <div class="text-danger small mt-1" th:if="${#fields.hasErrors('priceHour')}" th:errors="*{priceHour}"></div>
+                            <div class="text-danger small mt-1 fw-bold" th:if="${#fields.hasErrors('priceHour')}" th:errors="*{priceHour}"></div>
                         </div>
 
                         <div class="col-md-6">
-                            <label class="form-label small fw-bold">Viloyat <span class="text-danger">*</span></label>
-                            <select id="regionSelect" class="form-select form-select-lg rounded-3" required>
+                            <label class="form-label-custom">Viloyat <span class="text-danger">*</span></label>
+                            <select id="regionSelect" class="form-select input-cyber" required>
                                 <option value="">-- Viloyatni tanlang --</option>
                                 <option th:each="reg : ${regions}" th:value="${reg.id}" th:text="${reg.regionName}"></option>
                             </select>
                         </div>
 
                         <div class="col-md-6">
-                            <label class="form-label small fw-bold">Tuman / Shahar <span class="text-danger">*</span></label>
-                            <select id="districtSelect" th:field="*{districtId}" class="form-select form-select-lg rounded-3" required
+                            <label class="form-label-custom">Tuman / Shahar <span class="text-danger">*</span></label>
+                            <select id="districtSelect" th:field="*{districtId}" class="form-select input-cyber" required
                                     th:disabled="${!isEdit}" th:data-selected="${isEdit} ? *{districtId} : ''">
                                 <option value="">-- Avval viloyatni tanlang --</option>
                             </select>
-                            <div class="text-danger small mt-1" th:if="${#fields.hasErrors('districtId')}" th:errors="*{districtId}"></div>
+                            <div class="text-danger small mt-1 fw-bold" th:if="${#fields.hasErrors('districtId')}" th:errors="*{districtId}"></div>
                         </div>
 
                         <div class="col-12">
-                            <label class="form-label small fw-bold">Aniq manzil (Mo'ljal) <span class="text-danger">*</span></label>
-                            <input type="text" th:field="*{address}" class="form-control form-control-lg rounded-3" required placeholder="Masalan: Chilonzor 2-kvartal, G'ofur G'ulom bog'i ro'parasi">
-                            <div class="text-danger small mt-1" th:if="${#fields.hasErrors('address')}" th:errors="*{address}"></div>
+                            <label class="form-label-custom">Aniq manzil va mo'ljal <span class="text-danger">*</span></label>
+                            <input type="text" th:field="*{address}" class="form-control input-cyber" required placeholder="Masalan: Chilonzor 4-kvartal, 21-maktab stadioni orqasi">
+                            <div class="text-danger small mt-1 fw-bold" th:if="${#fields.hasErrors('address')}" th:errors="*{address}"></div>
                         </div>
 
                         <div class="col-12" th:if="${!isEdit}">
-                            <label class="form-label small fw-bold text-success">
-                                <i class="bi bi-images me-1"></i> Stadion rasmlarini yuklang (Kamida 1 ta rasm) <span class="text-danger">*</span>
-                            </label>
-                            <input type="file" name="images" class="form-control form-control-lg rounded-3" multiple accept="image/*" required>
-                            <div class="form-text small text-muted">Bir vaqtning o'zida bir nechta chiroyli rasmlarni tanlashingiz mumkin.</div>
+                            <label class="form-label-custom text-success"><i class="bi bi-images me-1"></i> Stadion rasmlari <span class="text-danger">*</span></label>
+                            <div class="upload-dropzone" onclick="document.getElementById('hiddenFileInput').click()">
+                                <i class="bi bi-cloud-arrow-up-fill mb-2 d-block"></i>
+                                <span class="fw-bold text-dark d-block">Rasmlarni shu yerga yuklang yoki bosing</span>
+                                <small class="text-muted small d-block mt-1">Kamida 1 ta sifatli rasm (JPEG, PNG). Bir vaqtda bir nechtasini tanlash mumkin.</small>
+                                <input type="file" id="hiddenFileInput" name="images" style="display: none;" multiple accept="image/*" required onchange="updateDropzoneText(this)">
+                            </div>
                         </div>
 
                         <div class="col-md-4">
-                            <label class="form-label small fw-bold">Maydon turi <span class="text-danger">*</span></label>
-                            <select th:field="*{fieldType}" class="form-select form-select-lg rounded-3" required>
+                            <label class="form-label-custom">Stadion sport turi <span class="text-danger">*</span></label>
+                            <select th:field="*{fieldType}" class="form-select input-cyber" required>
                                 <option value="FOOTBALL">Futbol maydoni</option>
                                 <option value="TENNIS">Tennis korti</option>
                                 <option value="BASKETBALL">Basketbol maydoni</option>
                             </select>
-                            <div class="text-danger small mt-1" th:if="${#fields.hasErrors('fieldType')}" th:errors="*{fieldType}"></div>
+                            <div class="text-danger small mt-1 fw-bold" th:if="${#fields.hasErrors('fieldType')}" th:errors="*{fieldType}"></div>
                         </div>
 
                         <div class="col-md-4">
-                            <label class="form-label small fw-bold">Ochilish vaqti <span class="text-danger">*</span></label>
-                            <input type="time" th:field="*{openTime}" class="form-control form-control-lg rounded-3" required>
+                            <label class="form-label-custom">Ish boshlash vaqti <span class="text-danger">*</span></label>
+                            <input type="time" th:field="*{openTime}" class="form-control input-cyber" required>
                         </div>
 
                         <div class="col-md-4">
-                            <label class="form-label small fw-bold">Yopilish vaqti <span class="text-danger">*</span></label>
-                            <input type="time" th:field="*{closeTime}" class="form-control form-control-lg rounded-3" required>
+                            <label class="form-label-custom">Yopilish vaqti <span class="text-danger">*</span></label>
+                            <input type="time" th:field="*{closeTime}" class="form-control input-cyber" required>
                         </div>
 
                         <div class="col-md-6">
-                            <div class="form-check form-switch card p-3 rounded-3 border bg-light d-flex align-items-center justify-content-between ps-5">
-                                <label class="form-check-label fw-medium m-0" for="showerSwitch">
-                                    <i class="bi bi-droplet text-primary me-1"></i> Dush xonasi mavjud
-                                </label>
-                                <input class="form-check-input form-check-input-lg" type="checkbox" th:field="*{hasShower}" id="showerSwitch">
+                            <div class="switch-card-custom" onclick="toggleSwitch('showerSwitch')">
+                                <span class="fw-bold text-secondary-emphasis" style="font-size: 0.95rem;">
+                                    <i class="bi bi-droplet-fill text-primary me-2 fs-5"></i> Dush xonasi mavjud
+                                </span>
+                                <div class="form-check form-switch m-0 p-0">
+                                    <input class="form-check-input form-check-input-lg" type="checkbox" th:field="*{hasShower}" id="showerSwitch" style="cursor: pointer;">
+                                </div>
                             </div>
                         </div>
+
                         <div class="col-md-6">
-                            <div class="form-check form-switch card p-3 rounded-3 border bg-light d-flex align-items-center justify-content-between ps-5">
-                                <label class="form-check-label fw-medium m-0" for="lightSwitch">
-                                    <i class="bi bi-brightness-high text-warning me-1"></i> Tungi yoritgichlar bor
-                                </label>
-                                <input class="form-check-input form-check-input-lg" type="checkbox" th:field="*{hasLight}" id="lightSwitch">
+                            <div class="switch-card-custom" onclick="toggleSwitch('lightSwitch')">
+                                <span class="fw-bold text-secondary-emphasis" style="font-size: 0.95rem;">
+                                    <i class="bi bi-brightness-high-fill text-warning me-2 fs-5"></i> Tungi yoritgichlar mavjud
+                                </span>
+                                <div class="form-check form-switch m-0 p-0">
+                                    <input class="form-check-input form-check-input-lg" type="checkbox" th:field="*{hasLight}" id="lightSwitch" style="cursor: pointer;">
+                                </div>
                             </div>
                         </div>
 
                         <div class="col-12 mt-4">
-                            <label class="form-label small fw-bold text-primary">
-                                <i class="bi bi-geo-alt-fill me-1"></i> Xaritadan stadion ustiga bosing (Koordinata avtomatik olinadi): <span class="text-danger">*</span>
+                            <label class="form-label-custom text-primary">
+                                <i class="bi bi-geo-alt-fill me-1"></i> Xaritadagi joylashuvi <span class="text-danger">*</span>
                             </label>
-                            <div id="map" class="shadow-sm"></div>
+                            <p class="text-muted small mb-3">Stadionning aniq geografik nuqtasini ko'rsatish uchun xarita ustiga bosing. Koordinata avtomatik saqlanadi.</p>
+                            <div id="map" class="rounded-4"></div>
                         </div>
 
                         <input type="hidden" th:field="*{latitude}" id="latInput">
                         <input type="hidden" th:field="*{longitude}" id="lngInput">
 
-                        <div class="col-12 mt-2">
-                            <label class="form-label small fw-bold">Qo'shimcha tavsif (Eslatmalar)</label>
-                            <textarea th:field="*{description}" class="form-control rounded-3" rows="4" placeholder="Maydon qoplamasi turi, kiyinish xonasi yoki avtoturargoh haqida ma'lumot yozishingiz mumkin..."></textarea>
+                        <div class="col-12 mt-3">
+                            <label class="form-label-custom">Qo'shimcha qulayliklar va tavsif</label>
+                            <textarea th:field="*{description}" class="form-control input-cyber" rows="4" placeholder="Masalan: Maydon qoplamasi Gollandiya sun'iy chimi, kiyinish xonasi va bepul avtoturargoh mavjud..."></textarea>
                         </div>
 
                         <div class="col-12 mt-4">
-                            <button type="submit" th:class="${isEdit} ? 'btn btn-warning-custom w-100 shadow-sm' : 'btn btn-success-custom w-100 shadow-sm text-white'">
-                                <i class="bi bi-check-lg me-1"></i>
-                                <span th:text="${isEdit} ? 'O\'zgarishlarni muvaffaqiyatli saqlash' : 'Maydonni muvaffaqiyatli saqlash'"></span>
+                            <button type="submit" th:class="${isEdit} ? 'btn btn-warning btn-sport-submit w-100 shadow-sm fw-bold text-dark' : 'btn btn-success btn-sport-submit w-100 shadow-sm text-white fw-bold'">
+                                <i class="bi bi-cloud-check-fill me-2 fs-5"></i>
+                                <span th:text="${isEdit} ? 'O\'zgarishlarni tizimga saqlash' : 'Sport maydonini tizimga joylashtirish'"></span>
                             </button>
                         </div>
                     </div>
                 </form>
+
             </div>
         </div>
     </div>
@@ -162,11 +269,45 @@
 <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
 
 <script th:inline="javascript">
-    document.addEventListener("DOMContentLoaded", function () {
+    // 🟢 YANGI MANTIQ: Foydalanuvchini kelgan joyiga qaytarish, agar tarix bo'lmasa dashboardga yuborish
+    function goBackOrDashboard() {
+        if (document.referrer && document.referrer.trim() !== "") {
+            window.history.back();
+        } else {
+            window.location.href = "/profile/dashboard";
+        }
+    }
 
-        // ==========================================
-        // 1. REGION -> DISTRICT AJAX LOGIKASI
-        // ==========================================
+    // 🟢 TUZATILDI: Rasmlar sonini frontendda (1 tadan 5 tagacha) cheklash
+    function updateDropzoneText(input) {
+        const dropzone = input.parentElement;
+        const files = input.files;
+
+        if (files && files.length > 0) {
+            if (files.length > 5) {
+                alert("⚠️ Xatolik! Ko'pi bilan 5 ta rasm yuklash mumkin. Iltimos, qaytadan tanlang.");
+                input.value = ""; // Tanlangan fayllarni tozalab tashlaymiz
+                dropzone.style.borderColor = "#cbd5e1";
+                dropzone.style.background = "rgba(248, 250, 252, 0.6)";
+                dropzone.querySelector('span').innerText = "Rasmlarni shu yerga yuklang yoki bosing";
+                dropzone.querySelector('span').style.color = "#0f172a";
+                return;
+            }
+
+            // Agar hammasi joyida bo'lsa, yashil qilib tayyorligini ko'rsatamiz
+            dropzone.style.borderColor = "#10b981";
+            dropzone.style.background = "rgba(16, 185, 129, 0.04)";
+            dropzone.querySelector('span').innerText = `Tizimga ${files.length} ta rasm yuklashga tayyorlandi!`;
+            dropzone.querySelector('span').style.color = "#10b981";
+        }
+    }
+
+    function toggleSwitch(id) {
+        const checkbox = document.getElementById(id);
+        if(checkbox) checkbox.checked = !checkbox.checked;
+    }
+
+    document.addEventListener("DOMContentLoaded", function () {
         const regionSelect = document.getElementById('regionSelect');
         const districtSelect = document.getElementById('districtSelect');
         const selectedDistrictId = districtSelect.getAttribute("data-selected");
@@ -177,7 +318,6 @@
                 districtSelect.disabled = true;
                 return;
             }
-
             districtSelect.innerHTML = '<option value="">Yuklanmoqda...</option>';
             districtSelect.disabled = true;
 
@@ -189,7 +329,6 @@
                 .then(districts => {
                     let html = '<option value="">-- Tumanni tanlang --</option>';
                     districts.forEach(d => {
-                        // Agar edit rejimi bo'lsa, o'sha tumanni tanlangan qilib qo'yadi
                         const isSel = (selectedDistrictId && d.id == selectedDistrictId) ? 'selected' : '';
                         html += `<option value="${d.id}" ${isSel}>${d.districtName}</option>`;
                     });
@@ -209,12 +348,6 @@
             });
         }
 
-        // Tahrirlash rejimida agar tuman ID saqlangan bo'lsa, avtomat yuklash shart emas (egasining o'zi viloyatni bossa ishlaydi)
-        // Lekin toza ishlashi uchun tahrirlash oynasida tumanlar bloklanib qolmaydi.
-
-        // ==========================================
-        // 🗺️ 2. YANDEX MAP: KOORDINATANI AVTOMAT OLISH
-        // ==========================================
         ymaps.ready(init);
 
         function init() {
@@ -233,19 +366,17 @@
 
             var myPlacemark;
 
-            // Tahrirlash yoki xato bilan qaytganda eski markerni xaritaga aniq chizish
             if (latInput.value && lngInput.value) {
                 myPlacemark = new ymaps.Placemark([initialLat, initialLng], {
                     hintContent: 'Maydon joylashuvi'
                 }, {
-                    preset: 'islands#redDotIcon'
+                    preset: 'islands#darkGreenDotIconWithCaption'
                 });
                 myMap.geoObjects.add(myPlacemark);
             }
 
             myMap.events.add('click', function (e) {
                 var coords = e.get('coords');
-
                 latInput.value = coords[0];
                 lngInput.value = coords[1];
 
@@ -255,25 +386,30 @@
                     myPlacemark = new ymaps.Placemark(coords, {
                         hintContent: 'Siz tanlagan joy!'
                     }, {
-                        preset: 'islands#redDotIcon'
+                        preset: 'islands#darkGreenDotIconWithCaption'
                     });
                     myMap.geoObjects.add(myPlacemark);
                 }
             });
         }
 
-        // ==========================================
-        // 3. FRONT-END VALIDATION
-        // ==========================================
         const fieldForm = document.getElementById("fieldForm");
-
         if (fieldForm) {
             fieldForm.addEventListener("submit", function (event) {
                 const lat = document.getElementById('latInput').value;
                 const lng = document.getElementById('lngInput').value;
+                const fileInput = document.getElementById('hiddenFileInput');
 
+                // 1. Geolokatsiya tekshiruvi
                 if (!lat || lat.trim() === "" || !lng || lng.trim() === "") {
-                    alert("⚠️ Iltimos, sport maydonining geolokatsiyasini belgilash uchun xaritadan stadion ustiga bosing!");
+                    alert("⚠️ Diqqat! Sport maydonining xaritadagi koordinatalarini belgilash shart. Iltimos, xarita ustiga bosing!");
+                    event.preventDefault();
+                    return false;
+                }
+
+                // 2. 🟢 YANGI: Yangi maydon qo'shilayotganda rasm sonini tekshirish (isEdit holatida bu input yo'q bo'ladi)
+                if (fileInput && (!fileInput.files || fileInput.files.length === 0)) {
+                    alert("⚠️ Diqqat! Sport maydoni uchun kamida 1 ta rasm yuklashingiz shart!");
                     event.preventDefault();
                     return false;
                 }

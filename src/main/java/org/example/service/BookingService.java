@@ -3,6 +3,7 @@ package org.example.service;
 import jdk.dynalink.linker.LinkerServices;
 import lombok.RequiredArgsConstructor;
 import org.example.dto.BookingCreateDto;
+import org.example.dto.BookingOfflineCreateDto;
 import org.example.dto.BookingResponceDto;
 import org.example.entity.Booking;
 import org.example.entity.SportField;
@@ -130,6 +131,10 @@ public class BookingService {
         Booking booking = bookingRepository.findById(bookingId).orElseThrow(() ->
                 new ResourceNotFoundException("Ijara topilmadi: " + bookingId));
 
+        if (booking.getStatus() == BookingStatus.CANCELLED) {
+            return;
+        }
+
         if (!booking.getCustomer().getUsername().equals(username) &&
             !booking.getSportField().getOwner().getUsername().equals(username)) {
             throw new BadRequestException("Xatolik: Siz bu ijarani bekor qilish huquqiga ega emassiz");
@@ -150,6 +155,20 @@ public class BookingService {
         bookingRepository.save(booking);
     }
 
+    @Transactional
+    public void cancelFutureBookingsForField(Long fieldId) {
+        List<Booking> futureBookings = bookingRepository.findBySportFieldIdAndStatusAndEndTimeAfterOrderByStartTimeAsc(
+                fieldId, BookingStatus.CONFIRMED, LocalDateTime.now());
+
+        if (!futureBookings.isEmpty()) {
+            for (Booking booking : futureBookings) {
+                booking.setStatus(BookingStatus.CANCELLED);
+            }
+            bookingRepository.saveAll(futureBookings);
+        }
+    }
+
+
     @Scheduled(cron = "0 */15 * * * *")
     @Transactional
     public void autoCompletePastBookings() {
@@ -160,5 +179,47 @@ public class BookingService {
             booking.setStatus(BookingStatus.COMPLETED);
         }
         bookingRepository.saveAll(pastBookings);
+    }
+
+    public BookingResponceDto createOfflineBooking(BookingOfflineCreateDto dto, String ownerUsername) {
+        SportField sportField = sportFieldRepository.findById(dto.getFieldId()).orElseThrow(() ->
+                new ResourceNotFoundException("Maydon topilmadi: " + dto.getFieldId()));
+
+        if (!sportField.getOwner().getUsername().equals(ownerUsername)) {
+            throw new BadRequestException("Xatolik: Siz ushbu maydonning egasi emassiz, offline bron qo'sha olmaysiz!");
+        }
+
+        LocalDateTime startTime = dto.getStartTime().withSecond(0).withNano(0);
+        LocalDateTime endTime = dto.getEndTime().withSecond(0).withNano(0);
+
+        if (startTime.isAfter(endTime) || startTime.isEqual(endTime)) {
+            throw new BadRequestException("Boshlanish vaqti tugash vaqtidan oldin bo'lishi kerak:");
+        }
+
+        if (bookingRepository.existsOverLappingBooking(dto.getFieldId(), startTime, endTime)) {
+            throw new BadRequestException("Bu vaqt oralig'i band qilingan:");
+        }
+
+        long minutes = Duration.between(startTime, endTime).toMinutes();
+        BigDecimal hours = BigDecimal.valueOf(minutes).divide(BigDecimal.valueOf(60), 2, RoundingMode.HALF_UP);
+        BigDecimal totalPrice = sportField.getPriceHour().multiply(hours);
+
+        Booking booking = Booking.builder()
+                .customer(null)
+                .sportField(sportField)
+                .startTime(startTime)
+                .endTime(endTime)
+                .totalPrice(totalPrice)
+                .status(BookingStatus.CONFIRMED)
+                .notes(dto.getNotes())
+                .build();
+
+        Booking savedBooking = bookingRepository.save(booking);
+
+        BookingResponceDto responseDto = mapper.toDto(savedBooking);
+        responseDto.setFieldName(sportField.getName());
+        responseDto.setCustomerFullName(dto.getNotes() != null ? dto.getNotes() : "Offline Mijoz");
+
+        return responseDto;
     }
 }
